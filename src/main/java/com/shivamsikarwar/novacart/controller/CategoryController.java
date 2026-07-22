@@ -5,11 +5,11 @@ import com.shivamsikarwar.novacart.dto.CategoryResponseDto;
 import com.shivamsikarwar.novacart.entity.Category;
 import com.shivamsikarwar.novacart.service.CategoryService;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.StreamingHttpOutputMessage;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 
 @RestController
@@ -25,5 +25,26 @@ public class CategoryController {
     @PostMapping
     public CategoryResponseDto createCategory(@Valid @RequestBody CategoryRequestDto request){
         return categoryService.createCategory(request);
+    }
+
+    @GetMapping
+    public List<CategoryResponseDto> getAllCategories() {
+        return categoryService.getAllCategories();
+    }
+
+    @GetMapping("/{id}")
+    public CategoryResponseDto getCategoryById(@PathVariable Long id){
+        return categoryService.getCategoryById(id);
+    }
+
+    @PutMapping("/{id}")
+    public CategoryResponseDto updateCategory(@PathVariable Long id, @Valid @RequestBody CategoryRequestDto request){
+        return categoryService.updateCategory(id, request);
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteCategory(@PathVariable Long id){
+        categoryService.deleteCategory(id);
     }
 }

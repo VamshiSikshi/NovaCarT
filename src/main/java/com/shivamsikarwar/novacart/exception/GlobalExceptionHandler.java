@@ -16,8 +16,7 @@ import java.util.Map;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ApiErrorResponse> handleValidationException(
-            MethodArgumentNotValidException ex) {
+    public ResponseEntity<ApiErrorResponse> handleValidationException(MethodArgumentNotValidException ex) {
 
         Map<String, String> errors = new HashMap<>();
 
@@ -32,5 +31,16 @@ public class GlobalExceptionHandler {
         response.setErrors(errors);
 
         return ResponseEntity.badRequest().body(response);
+    }
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<ApiErrorResponse> handleResourceNotFound(ResourceNotFoundException ex){
+        ApiErrorResponse response=new ApiErrorResponse();
+
+        response.setTimestamp(LocalDateTime.now());
+        response.setStatus(HttpStatus.NOT_FOUND.value());
+        response.setMessage(ex.getMessage());
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
     }
 }
