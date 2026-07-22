@@ -9,6 +9,8 @@ import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.data.annotation.CreatedDate;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -25,6 +27,9 @@ public class Category {
 
     @Column(length = 500)
     private String description;
+
+    @OneToMany(mappedBy = "category")
+    private List<Product> products=new ArrayList<>();
 
     @CreationTimestamp
     @Column(nullable=false, updatable = false)
