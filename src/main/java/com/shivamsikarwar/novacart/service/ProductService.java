@@ -7,8 +7,11 @@ import com.shivamsikarwar.novacart.entity.Product;
 import com.shivamsikarwar.novacart.exception.ResourceNotFoundException;
 import com.shivamsikarwar.novacart.repository.CategoryRepository;
 import com.shivamsikarwar.novacart.repository.ProductRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,45 +28,25 @@ public class ProductService {
     }
 
     public ProductResponseDto createProduct(ProductRequestDto request){
-        Category category =categoryRepository.findById(request.getCategoryId())
-                .orElseThrow(()->new ResourceNotFoundException
-                        ("Category not found with id: "+ request.getCategoryId()));
-
+        Category category=findCategoryById(request.getCategoryId());
         Product product=toEntity(request, category);
         Product savedProduct=productRepository.save(product);
         return toResponseDto(savedProduct);
     }
 
-    public List<ProductResponseDto> getAllProducts() {
-        List<Product> products = productRepository.findAll();
-        List<ProductResponseDto> response = new ArrayList<>();
-
-        for (Product product : products) {
-            response.add(toResponseDto(product));
-        }
-        return response;
+    public Page<ProductResponseDto> getAllProducts(Pageable pageable) {
+        Page<Product> productPage = productRepository.findAll(pageable);
+        return productPage.map(this::toResponseDto);
     }
 
     public ProductResponseDto getProductById(Long id) {
-        Product product = productRepository.findById(id)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException(
-                                "Product not found with id: " + id));
-
+        Product product=findProductById(id);
         return toResponseDto(product);
     }
 
     public ProductResponseDto updateProduct(Long id, ProductRequestDto request) {
-
-        Product product = productRepository.findById(id)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException(
-                                "Product not found with id: " + id));
-
-        Category category = categoryRepository.findById(request.getCategoryId())
-                .orElseThrow(() ->
-                        new ResourceNotFoundException(
-                                "Category not found with id: " + request.getCategoryId()));
+        Product product=findProductById(id);
+        Category category=findCategoryById(request.getCategoryId());
 
         product.setName(request.getName());
         product.setDescription(request.getDescription());
@@ -78,12 +61,45 @@ public class ProductService {
     }
 
     public void deleteProduct(Long id) {
-        Product product = productRepository.findById(id)
+        Product product=findProductById(id);
+        productRepository.delete(product);
+    }
+
+    public List<ProductResponseDto> searchProducts(String keyword){
+
+        return productRepository.searchProducts(keyword)
+                .stream().map(this::toResponseDto).toList();
+    }
+
+    public List<ProductResponseDto> getProductsByCategory(Long categoryId){
+        Category category=findCategoryById(categoryId);
+        return productRepository.findByCategoryId(categoryId).stream().map(this::toResponseDto).toList();
+    }
+
+    public List<ProductResponseDto> filterProductsByPrice(BigDecimal minPrice, BigDecimal maxPrice){
+        return productRepository.findByPriceBetween(minPrice,maxPrice).stream().map(this::toResponseDto).toList();
+    }
+
+    public List<ProductResponseDto> getExpensiveProducts(BigDecimal price){
+        return productRepository
+                .findProductsWithPriceGreaterThan(price)
+                .stream()
+                .map(this::toResponseDto)
+                .toList();
+    }
+
+    private Product findProductById(Long id) {
+        return productRepository.findById(id)
                 .orElseThrow(() ->
                         new ResourceNotFoundException(
                                 "Product not found with id: " + id));
+    }
 
-        productRepository.delete(product);
+    private Category findCategoryById(Long id) {
+        return categoryRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Category not found with id: " + id));
     }
 
     private ProductResponseDto toResponseDto(Product product){
