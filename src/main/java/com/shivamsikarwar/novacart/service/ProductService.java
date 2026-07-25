@@ -1,7 +1,9 @@
 package com.shivamsikarwar.novacart.service;
 
+import com.shivamsikarwar.novacart.dto.ProductCategoryDto;
 import com.shivamsikarwar.novacart.dto.ProductRequestDto;
 import com.shivamsikarwar.novacart.dto.ProductResponseDto;
+import com.shivamsikarwar.novacart.dto.ProductSummaryDto;
 import com.shivamsikarwar.novacart.entity.Category;
 import com.shivamsikarwar.novacart.entity.Product;
 import com.shivamsikarwar.novacart.exception.ResourceNotFoundException;
@@ -101,6 +103,50 @@ public class ProductService {
                         new ResourceNotFoundException(
                                 "Category not found with id: " + id));
     }
+
+    public List<ProductResponseDto> getProductByPriceDesc(){
+        return productRepository.findAllOrderByPriceDesc()
+                .stream()
+                .map(this::toResponseDto)
+                .toList();
+    }
+
+    public Long countProducts(){
+        return productRepository.countProducts();
+    }
+
+    public BigDecimal getHighestPrice(){
+        return productRepository.getHighestPrice();
+    }
+
+    public BigDecimal getLowestPrice(){
+        return productRepository.getLowestPrice();
+    }
+
+    public Double getAveragePrice(){
+        return productRepository.getAveragePrice();
+    }
+
+    public Long getTotalStock(){
+        return productRepository.getTotalStock();
+    }
+
+    public List<ProductSummaryDto> getProductSummaries(){
+        return productRepository.getProductSummaries();
+    }
+
+    public List<ProductCategoryDto> getProductWithCategory(){
+        return productRepository.getProductWithCategory();
+    }
+
+    public List<ProductResponseDto> getAllProductWithCategory(){
+        return productRepository.findAllWithCategory()
+                .stream()
+                .map(this::toResponseDto)
+                .toList();
+    }
+
+
 
     private ProductResponseDto toResponseDto(Product product){
         ProductResponseDto response=new ProductResponseDto();

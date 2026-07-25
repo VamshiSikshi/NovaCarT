@@ -1,7 +1,9 @@
 package com.shivamsikarwar.novacart.controller;
 
+import com.shivamsikarwar.novacart.dto.ProductCategoryDto;
 import com.shivamsikarwar.novacart.dto.ProductRequestDto;
 import com.shivamsikarwar.novacart.dto.ProductResponseDto;
+import com.shivamsikarwar.novacart.dto.ProductSummaryDto;
 import com.shivamsikarwar.novacart.entity.Product;
 import com.shivamsikarwar.novacart.repository.ProductRepository;
 import com.shivamsikarwar.novacart.service.ProductService;
@@ -12,6 +14,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.annotation.RequestScope;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -78,4 +81,50 @@ public class ProductController {
     public List<ProductResponseDto> getExpensiveProducts(@RequestParam BigDecimal price){
         return productService.getExpensiveProducts(price);
     }
+
+    @GetMapping("/expensive-first")
+    public List<ProductResponseDto> getProductByPriceDesc(){
+        return productService.getProductByPriceDesc();
+    }
+
+    @GetMapping("/count")
+    public Long countProducts(){
+        return productService.countProducts();
+    }
+
+    @GetMapping("/highest-price")
+    public BigDecimal getHighestPrice(){
+        return productService.getHighestPrice();
+    }
+
+    @GetMapping("/lowest-price")
+    public BigDecimal getLowestPrice(){
+        return productService.getLowestPrice();
+    }
+
+    @GetMapping("/average-price")
+    public Double getAveragePrice(){
+        return productService.getAveragePrice();
+    }
+
+    @GetMapping("/total-stock")
+    public Long getTotalStock(){
+        return productService.getTotalStock();
+    }
+
+    @GetMapping("/summary")
+    public List<ProductSummaryDto> getProductSummaries(){
+        return productService.getProductSummaries();
+    }
+
+    @GetMapping("/with-category")
+    public List<ProductCategoryDto> getProductWithCategory(){
+        return productService.getProductWithCategory();
+    }
+
+    @GetMapping("/with-category-fetch")
+    public List<ProductResponseDto> getAllProductWithCategory(){
+        return productService.getAllProductWithCategory();
+    }
+
 }
