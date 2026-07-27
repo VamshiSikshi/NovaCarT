@@ -3,15 +3,24 @@ package com.shivamsikarwar.novacart.repository;
 import com.shivamsikarwar.novacart.dto.ProductCategoryDto;
 import com.shivamsikarwar.novacart.dto.ProductSummaryDto;
 import com.shivamsikarwar.novacart.entity.Product;
-import com.shivamsikarwar.novacart.service.ProductService;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
 import java.util.List;
 
-public interface ProductRepository extends JpaRepository<Product,Long> {
+public interface ProductRepository extends JpaRepository<Product,Long>, JpaSpecificationExecutor<Product> {
 
 
     List<Product> findByNameContainingIgnoreCase(String keyword);
@@ -69,7 +78,7 @@ public interface ProductRepository extends JpaRepository<Product,Long> {
     Double getAveragePrice();
 
     @Query("""
-            SELECT SUM(p.price)
+            SELECT SUM(p.stock)
             FROM Product p
             """)
     Long getTotalStock();
@@ -102,5 +111,32 @@ public interface ProductRepository extends JpaRepository<Product,Long> {
             """)
     List<Product> findAllWithCategory();
 
+    @Transactional
+    @Modifying(
+            clearAutomatically = true,
+            flushAutomatically = true
+    )
+    @Query("""
+            UPDATE Product p
+            SET p.price =p.price*1.1
+            """)
+    int increaseAllPrices();
 
+    @Transactional
+    @Modifying
+    @Query("""
+            DELETE 
+            FROM Product p
+            WHERE p.stock=0
+            """)
+    int deleteOutOfStockProducts();
+
+    @Query(value="""
+           SELECT *
+           FROM products
+           WHERE stock > :stock 
+            """,
+            nativeQuery = true)
+    List<Product> findAvailableProducts(@Param("stock") Integer stock);
 }
+

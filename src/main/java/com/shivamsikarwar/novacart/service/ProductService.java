@@ -9,12 +9,14 @@ import com.shivamsikarwar.novacart.entity.Product;
 import com.shivamsikarwar.novacart.exception.ResourceNotFoundException;
 import com.shivamsikarwar.novacart.repository.CategoryRepository;
 import com.shivamsikarwar.novacart.repository.ProductRepository;
+import com.shivamsikarwar.novacart.specification.ProductSpecification;
+import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -29,6 +31,7 @@ public class ProductService {
         this.categoryRepository=categoryRepository;
     }
 
+    @Transactional
     public ProductResponseDto createProduct(ProductRequestDto request){
         Category category=findCategoryById(request.getCategoryId());
         Product product=toEntity(request, category);
@@ -41,11 +44,13 @@ public class ProductService {
         return productPage.map(this::toResponseDto);
     }
 
+    @Transactional
     public ProductResponseDto getProductById(Long id) {
         Product product=findProductById(id);
         return toResponseDto(product);
     }
 
+    @Transactional
     public ProductResponseDto updateProduct(Long id, ProductRequestDto request) {
         Product product=findProductById(id);
         Category category=findCategoryById(request.getCategoryId());
@@ -62,6 +67,7 @@ public class ProductService {
         return toResponseDto(updatedProduct);
     }
 
+    @Transactional
     public void deleteProduct(Long id) {
         Product product=findProductById(id);
         productRepository.delete(product);
@@ -74,7 +80,7 @@ public class ProductService {
     }
 
     public List<ProductResponseDto> getProductsByCategory(Long categoryId){
-        Category category=findCategoryById(categoryId);
+        findCategoryById(categoryId);
         return productRepository.findByCategoryId(categoryId).stream().map(this::toResponseDto).toList();
     }
 
@@ -104,7 +110,7 @@ public class ProductService {
                                 "Category not found with id: " + id));
     }
 
-    public List<ProductResponseDto> getProductByPriceDesc(){
+    public List<ProductResponseDto> getProductsByPriceDesc(){
         return productRepository.findAllOrderByPriceDesc()
                 .stream()
                 .map(this::toResponseDto)
@@ -135,18 +141,63 @@ public class ProductService {
         return productRepository.getProductSummaries();
     }
 
-    public List<ProductCategoryDto> getProductWithCategory(){
+    public List<ProductCategoryDto> getProductsWithCategory(){
         return productRepository.getProductWithCategory();
     }
 
-    public List<ProductResponseDto> getAllProductWithCategory(){
+    public List<ProductResponseDto> getAllProductsWithCategory(){
         return productRepository.findAllWithCategory()
                 .stream()
                 .map(this::toResponseDto)
                 .toList();
     }
 
+    public int increaseAllPrices(){
+        return productRepository.increaseAllPrices();
+    }
 
+    public int deleteOutOfStockProducts(){
+        return productRepository.deleteOutOfStockProducts();
+    }
+
+    public List<ProductResponseDto> getAvailableProducts(Integer stock){
+        return productRepository.findAvailableProducts(stock)
+                .stream()
+                .map(this::toResponseDto)
+                .toList();
+    }
+
+    public List<ProductResponseDto> searchProducts(
+            String keyword,
+            Long categoryId,
+            BigDecimal minPrice,
+            BigDecimal maxPrice) {
+
+        Specification<Product> specification =Specification.unrestricted();
+
+        if (keyword != null && !keyword.isBlank()) {
+            specification = specification.and(ProductSpecification.hasName(keyword));
+        }
+
+        if (categoryId != null) {
+            specification = specification.and(ProductSpecification.hasCategory(categoryId));
+        }
+
+        if (minPrice != null) {
+            specification = specification.and(ProductSpecification.hasMinPrice(minPrice));
+        }
+
+        if (maxPrice != null) {
+            specification = specification.and(ProductSpecification.hasMaxPrice(maxPrice));
+        }
+
+        specification = specification.and(ProductSpecification.inStock());
+
+        return productRepository.findAll(specification)
+                .stream()
+                .map(this::toResponseDto)
+                .toList();
+    }
 
     private ProductResponseDto toResponseDto(Product product){
         ProductResponseDto response=new ProductResponseDto();
