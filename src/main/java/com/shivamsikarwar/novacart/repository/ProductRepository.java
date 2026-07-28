@@ -3,15 +3,14 @@ package com.shivamsikarwar.novacart.repository;
 import com.shivamsikarwar.novacart.dto.ProductCategoryDto;
 import com.shivamsikarwar.novacart.dto.ProductSummaryDto;
 import com.shivamsikarwar.novacart.entity.Product;
-import com.shivamsikarwar.novacart.service.ProductService;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
+import jakarta.transaction.Transactional;
+import org.springframework.data.jpa.repository.*;
 import org.springframework.data.repository.query.Param;
 
 import java.math.BigDecimal;
 import java.util.List;
 
-public interface ProductRepository extends JpaRepository<Product,Long> {
+public interface ProductRepository extends JpaRepository<Product,Long>, JpaSpecificationExecutor<Product> {
 
 
     List<Product> findByNameContainingIgnoreCase(String keyword);
@@ -69,7 +68,7 @@ public interface ProductRepository extends JpaRepository<Product,Long> {
     Double getAveragePrice();
 
     @Query("""
-            SELECT SUM(p.price)
+            SELECT SUM(p.stock)
             FROM Product p
             """)
     Long getTotalStock();
@@ -102,5 +101,35 @@ public interface ProductRepository extends JpaRepository<Product,Long> {
             """)
     List<Product> findAllWithCategory();
 
+    @Transactional
+    @Modifying(
+            clearAutomatically = true,
+            flushAutomatically = true
+    )
+    @Query("""
+            UPDATE Product p
+            SET p.price =p.price*1.1
+            """)
+    int increaseAllPrices();
 
+    @Transactional
+    @Modifying
+    @Query("""
+            DELETE 
+            FROM Product p
+            WHERE p.stock=0
+            """)
+    int deleteOutOfStockProducts();
+
+    @Query(value="""
+           SELECT *
+           FROM products
+           WHERE stock > :stock 
+            """,
+            nativeQuery = true)
+    List<Product> findAvailableProducts(@Param("stock") Integer stock);
+
+    @EntityGraph(attributePaths = "category")
+    List<Product> findAllBy();
 }
+
