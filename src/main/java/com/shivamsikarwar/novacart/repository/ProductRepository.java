@@ -3,19 +3,9 @@ package com.shivamsikarwar.novacart.repository;
 import com.shivamsikarwar.novacart.dto.ProductCategoryDto;
 import com.shivamsikarwar.novacart.dto.ProductSummaryDto;
 import com.shivamsikarwar.novacart.entity.Product;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.Predicate;
-import jakarta.persistence.criteria.Root;
 import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.*;
 import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -138,5 +128,8 @@ public interface ProductRepository extends JpaRepository<Product,Long>, JpaSpeci
             """,
             nativeQuery = true)
     List<Product> findAvailableProducts(@Param("stock") Integer stock);
+
+    @EntityGraph(attributePaths = "category")
+    List<Product> findAllBy();
 }
 
