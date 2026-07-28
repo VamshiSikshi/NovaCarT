@@ -11,6 +11,9 @@ import com.shivamsikarwar.novacart.repository.CategoryRepository;
 import com.shivamsikarwar.novacart.repository.ProductRepository;
 import com.shivamsikarwar.novacart.specification.ProductSpecification;
 import jakarta.transaction.Transactional;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -44,12 +47,17 @@ public class ProductService {
         return productPage.map(this::toResponseDto);
     }
 
+    @Cacheable(value="products", key="#id")
     @Transactional
     public ProductResponseDto getProductById(Long id) {
         Product product=findProductById(id);
         return toResponseDto(product);
     }
 
+    @CachePut(
+            value = "products",
+            key="#id"
+    )
     @Transactional
     public ProductResponseDto updateProduct(Long id, ProductRequestDto request) {
         Product product=findProductById(id);
@@ -67,6 +75,10 @@ public class ProductService {
         return toResponseDto(updatedProduct);
     }
 
+    @CacheEvict(
+            value="products",
+            key="#id"
+    )
     @Transactional
     public void deleteProduct(Long id) {
         Product product=findProductById(id);
@@ -194,6 +206,13 @@ public class ProductService {
         specification = specification.and(ProductSpecification.inStock());
 
         return productRepository.findAll(specification)
+                .stream()
+                .map(this::toResponseDto)
+                .toList();
+    }
+
+    public List<ProductResponseDto> getAllProductsWithEntityGraph(){
+        return productRepository.findAllBy()
                 .stream()
                 .map(this::toResponseDto)
                 .toList();

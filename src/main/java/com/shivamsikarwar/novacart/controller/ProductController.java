@@ -40,7 +40,7 @@ public class ProductController {
     public ProductResponseDto getProductById(
             @PathVariable Long id) {
 
-        return productService.getProductsById(id);
+        return productService.getProductById(id);
     }
 
     @PutMapping("/{id}")
@@ -162,5 +162,10 @@ public class ProductController {
                 minPrice,
                 maxPrice
         );
+    }
+
+    @GetMapping("/with-category-graph")
+    public List<ProductResponseDto> getAllProductsWithEntityGraph(){
+        return productService.getAllProductsWithEntityGraph();
     }
 }
