@@ -1,5 +1,7 @@
 package com.shivamsikarwar.novacart.config;
 
+import com.shivamsikarwar.novacart.security.CustomAccessDeniedHandler;
+import com.shivamsikarwar.novacart.security.CustomAuthenticationEntryPoint;
 import com.shivamsikarwar.novacart.security.JwtAuthenticationFilter;
 import com.shivamsikarwar.novacart.service.CustomUserDetailsService;
 import org.springframework.context.annotation.Bean;
@@ -11,6 +13,7 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -22,13 +25,19 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
     private final CustomUserDetailsService userDetailsService;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final CustomAuthenticationEntryPoint authenticationEntryPoint;
+    private final CustomAccessDeniedHandler accessDeniedHandler;
 
     public SecurityConfig(
             CustomUserDetailsService userDetailsService,
-            JwtAuthenticationFilter jwtAuthenticationFilter) {
+            JwtAuthenticationFilter jwtAuthenticationFilter,
+            CustomAuthenticationEntryPoint authenticationEntryPoint,
+            CustomAccessDeniedHandler accessDeniedHandler) {
 
         this.userDetailsService = userDetailsService;
         this.jwtAuthenticationFilter=jwtAuthenticationFilter;
+        this.authenticationEntryPoint=authenticationEntryPoint;
+        this.accessDeniedHandler=accessDeniedHandler;
     }
 
     @Bean
@@ -54,15 +63,37 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http)
+    SecurityFilterChain securityFilterChain(HttpSecurity http)
             throws Exception {
 
         http
                 .csrf(csrf -> csrf.disable())
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll()
-                        .anyRequest().permitAll()
+                .cors(cors -> {})
+
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
+
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint(authenticationEntryPoint)
+                        .accessDeniedHandler(accessDeniedHandler)
+                )
+
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(
+                                "/api/auth/**",
+                                "/api/users"
+                        ).permitAll()
+
+                        .requestMatchers(
+                                org.springframework.http.HttpMethod.GET,
+                                "/api/products/**",
+                                "/api/categories/**"
+                        ).permitAll()
+
+                        .anyRequest().authenticated()
+                )
+
                 .addFilterBefore(
                         jwtAuthenticationFilter,
                         UsernamePasswordAuthenticationFilter.class
