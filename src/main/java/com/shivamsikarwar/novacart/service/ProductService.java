@@ -17,6 +17,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -34,6 +35,7 @@ public class ProductService {
         this.categoryRepository=categoryRepository;
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @Transactional
     public ProductResponseDto createProduct(ProductRequestDto request){
         Category category=findCategoryById(request.getCategoryId());
@@ -54,6 +56,7 @@ public class ProductService {
         return toResponseDto(product);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @CachePut(
             value = "products",
             key="#id"
@@ -79,6 +82,7 @@ public class ProductService {
             value="products",
             key="#id"
     )
+    @PreAuthorize("hasRole('ADMIN')")
     @Transactional
     public void deleteProduct(Long id) {
         Product product=findProductById(id);
@@ -115,6 +119,7 @@ public class ProductService {
                                 "Product not found with id: " + id));
     }
 
+
     private Category findCategoryById(Long id) {
         return categoryRepository.findById(id)
                 .orElseThrow(() ->
@@ -128,6 +133,7 @@ public class ProductService {
                 .map(this::toResponseDto)
                 .toList();
     }
+
 
     public Long countProducts(){
         return productRepository.countProducts();
@@ -164,10 +170,12 @@ public class ProductService {
                 .toList();
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     public int increaseAllPrices(){
         return productRepository.increaseAllPrices();
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     public int deleteOutOfStockProducts(){
         return productRepository.deleteOutOfStockProducts();
     }

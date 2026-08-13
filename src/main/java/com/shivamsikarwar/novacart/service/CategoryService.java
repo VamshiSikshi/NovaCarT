@@ -5,11 +5,11 @@ import com.shivamsikarwar.novacart.dto.CategoryResponseDto;
 import com.shivamsikarwar.novacart.entity.Category;
 import com.shivamsikarwar.novacart.exception.ResourceNotFoundException;
 import com.shivamsikarwar.novacart.repository.CategoryRepository;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class CategoryService {
@@ -20,6 +20,7 @@ public class CategoryService {
         this.categoryRepository=categoryRepository;
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     public CategoryResponseDto createCategory(CategoryRequestDto request){
         Category category=toEntity(request);
         Category savedCategory=categoryRepository.save(category);
@@ -42,6 +43,7 @@ public class CategoryService {
         return toResponseDto(category);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     public CategoryResponseDto updateCategory(Long id, CategoryRequestDto request){
         Category category=categoryRepository.findById(id)
                 .orElseThrow(()->new ResourceNotFoundException("Category not found with id: "+id));
@@ -53,6 +55,7 @@ public class CategoryService {
         return toResponseDto(updateCategory);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     public void deleteCategory(Long id){
         Category category=categoryRepository.findById(id)
                 .orElseThrow(()-> new ResourceNotFoundException("Category not found by id: "+id));
