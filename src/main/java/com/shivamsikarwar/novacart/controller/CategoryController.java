@@ -23,7 +23,6 @@ public class CategoryController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN')")
     public CategoryResponseDto createCategory(@Valid @RequestBody CategoryRequestDto request){
         return categoryService.createCategory(request);
     }
@@ -39,13 +38,11 @@ public class CategoryController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
     public CategoryResponseDto updateCategory(@PathVariable Long id, @Valid @RequestBody CategoryRequestDto request){
         return categoryService.updateCategory(id, request);
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteCategory(@PathVariable Long id){
         categoryService.deleteCategory(id);

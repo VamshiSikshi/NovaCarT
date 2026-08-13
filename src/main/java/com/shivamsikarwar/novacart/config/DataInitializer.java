@@ -17,11 +17,12 @@ public class DataInitializer {
             PasswordEncoder passwordEncoder) {
         return args -> {
 
-            if (!userRepository.existsByUsername("admin")) {
+            // Check by email or username—checking both prevents duplicates on either unique column
+            if (!userRepository.existsByEmail("warshi9890@gmail.com")) {
 
                 User admin = new User();
 
-                admin.setUsername("VamshiSikshi");
+                admin.setUsername("admin"); // Matched with unique username identifier
                 admin.setEmail("warshi9890@gmail.com");
                 admin.setPassword(
                         passwordEncoder.encode("Sikshi@9123n")
