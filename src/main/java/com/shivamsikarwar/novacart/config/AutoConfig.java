@@ -10,6 +10,6 @@ import java.util.Optional;
 public class AutoConfig {
     @Bean
     public AuditorAware<String> auditorProvider(){
-        return ()-> Optional.of("admin@example.com");
+        return ()-> Optional.of("warshi9890@gmail.com");
     }
 }
