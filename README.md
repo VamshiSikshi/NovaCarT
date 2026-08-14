@@ -1,2 +1,3 @@
 #NovaCart - Shopping Platform
-#Author - Shivam Sikarwar
+
+#Author - Shivam Sikarwar @vamshisikshi
