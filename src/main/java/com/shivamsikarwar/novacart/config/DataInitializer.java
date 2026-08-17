@@ -18,7 +18,8 @@ public class DataInitializer {
         return args -> {
 
             // Check by email or username—checking both prevents duplicates on either unique column
-            if (!userRepository.existsByEmail("warshi9890@gmail.com")) {
+            if (!userRepository.existsByEmail("warshi9890@gmail.com") &&
+                !userRepository.existsByUsername("Vamshi Sikshi")) {
 
                 User admin = new User();
 
@@ -30,8 +31,6 @@ public class DataInitializer {
 
                 admin.setRole(Role.ADMIN);
                 userRepository.save(admin);
-
-                System.out.println("Admin user created.");
             }
         };
     }

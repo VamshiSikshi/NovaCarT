@@ -125,4 +125,40 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(response);
     }
+
+    @ExceptionHandler(InsufficientStockException.class)
+    public ResponseEntity<ApiErrorResponse> handleInsufficientStock(
+            InsufficientStockException ex,
+            HttpServletRequest request) {
+
+        ApiErrorResponse response = new ApiErrorResponse();
+
+        response.setTimestamp(LocalDateTime.now());
+        response.setStatus(HttpStatus.CONFLICT.value());
+        response.setError(HttpStatus.CONFLICT.getReasonPhrase());
+        response.setMessage(ex.getMessage());
+        response.setPath(request.getRequestURI());
+
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .body(response);
+    }
+
+    @ExceptionHandler(AuthenticatedUserNotFoundException.class)
+    public ResponseEntity<ApiErrorResponse> handleAuthenticatedUserNotFound(
+            AuthenticatedUserNotFoundException ex,
+            HttpServletRequest request) {
+
+        ApiErrorResponse response = new ApiErrorResponse();
+
+        response.setTimestamp(LocalDateTime.now());
+        response.setStatus(HttpStatus.UNAUTHORIZED.value());
+        response.setError(HttpStatus.UNAUTHORIZED.getReasonPhrase());
+        response.setMessage(ex.getMessage());
+        response.setPath(request.getRequestURI());
+
+        return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
+                .body(response);
+    }
 }
