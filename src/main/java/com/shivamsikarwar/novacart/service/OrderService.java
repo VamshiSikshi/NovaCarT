@@ -1,0 +1,240 @@
+package com.shivamsikarwar.novacart.service;
+
+import com.shivamsikarwar.novacart.dto.OrderItemRequestDto;
+import com.shivamsikarwar.novacart.dto.OrderItemResponseDto;
+import com.shivamsikarwar.novacart.dto.OrderRequestDto;
+import com.shivamsikarwar.novacart.dto.OrderResponseDto;
+import com.shivamsikarwar.novacart.entity.Order;
+import com.shivamsikarwar.novacart.entity.OrderItem;
+import com.shivamsikarwar.novacart.entity.OrderStatus;
+import com.shivamsikarwar.novacart.entity.Product;
+import com.shivamsikarwar.novacart.entity.User;
+import com.shivamsikarwar.novacart.exception.AuthenticatedUserNotFoundException;
+import com.shivamsikarwar.novacart.exception.InsufficientStockException;
+import com.shivamsikarwar.novacart.exception.ResourceNotFoundException;
+import com.shivamsikarwar.novacart.repository.OrderRepository;
+import com.shivamsikarwar.novacart.repository.ProductRepository;
+import com.shivamsikarwar.novacart.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
+public class OrderService {
+
+    private final OrderRepository orderRepository;
+    private final ProductRepository productRepository;
+    private final UserRepository userRepository;
+
+
+    // =========================
+    // CREATE ORDER
+    // =========================
+
+    @Transactional
+    public OrderResponseDto createOrder(OrderRequestDto request) {
+
+        if (request == null ||
+                request.getItems() == null ||
+                request.getItems().isEmpty()) {
+
+            throw new ResourceNotFoundException(
+                    "Order must contain at least one item"
+            );
+        }
+
+        User user = getAuthenticatedUser();
+
+        Order order = new Order();
+
+        order.setUser(user);
+        order.setStatus(OrderStatus.PENDING);
+
+        BigDecimal totalAmount = BigDecimal.ZERO;
+
+        for (OrderItemRequestDto itemRequest : request.getItems()) {
+
+            if (itemRequest.getProductId() == null) {
+                throw new ResourceNotFoundException(
+                        "Product ID cannot be null"
+                );
+            }
+
+            if (itemRequest.getQuantity() == null ||
+                    itemRequest.getQuantity() <= 0) {
+
+                throw new ResourceNotFoundException(
+                        "Quantity must be greater than zero"
+                );
+            }
+
+            Product product = productRepository
+                    .findById(itemRequest.getProductId())
+                    .orElseThrow(() ->
+                            new ResourceNotFoundException(
+                                    "Product not found with id: "
+                                            + itemRequest.getProductId()
+                            )
+                    );
+
+            if (product.getStock() < itemRequest.getQuantity()) {
+
+                throw new InsufficientStockException(
+                        "Insufficient stock for product: "
+                                + product.getName()
+                );
+            }
+
+            BigDecimal price = product.getPrice();
+
+            BigDecimal subtotal = price.multiply(
+                    BigDecimal.valueOf(itemRequest.getQuantity())
+            );
+
+            OrderItem orderItem = new OrderItem();
+
+            orderItem.setOrder(order);
+            orderItem.setProduct(product);
+            orderItem.setQuantity(itemRequest.getQuantity());
+            orderItem.setPrice(price);
+            orderItem.setSubtotal(subtotal);
+
+            order.getItems().add(orderItem);
+
+            totalAmount = totalAmount.add(subtotal);
+
+            product.setStock(
+                    product.getStock()
+                            - itemRequest.getQuantity()
+            );
+        }
+
+        order.setTotalAmount(totalAmount);
+
+        Order savedOrder = orderRepository.save(order);
+
+        return mapToResponse(savedOrder);
+    }
+
+
+    // =========================
+    // GET MY ORDERS
+    // =========================
+
+    @Transactional(readOnly = true)
+    public List<OrderResponseDto> getMyOrders() {
+
+        User user = getAuthenticatedUser();
+
+        return orderRepository
+                .findByUserIdOrderByCreatedAtDesc(user.getId())
+                .stream()
+                .map(this::mapToResponse)
+                .toList();
+    }
+
+
+    // =========================
+    // GET MY SINGLE ORDER
+    // =========================
+
+    @Transactional(readOnly = true)
+    public OrderResponseDto getMyOrder(Long orderId) {
+
+        User user = getAuthenticatedUser();
+
+        Order order = orderRepository
+                .findByIdAndUserId(orderId, user.getId())
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Order not found with id: " + orderId
+                        )
+                );
+
+        return mapToResponse(order);
+    }
+
+
+    // =========================
+    // GET AUTHENTICATED USER
+    // =========================
+
+    private User getAuthenticatedUser() {
+
+        Authentication authentication =
+                SecurityContextHolder
+                        .getContext()
+                        .getAuthentication();
+
+        if (authentication == null ||
+                !authentication.isAuthenticated()) {
+
+            throw new AuthenticatedUserNotFoundException(
+                    "Authenticated user not found"
+            );
+        }
+
+        String username = authentication.getName();
+
+        return userRepository
+                .findByUsername(username)
+                .orElseThrow(() ->
+                        new AuthenticatedUserNotFoundException(
+                                "Authenticated user not found: "
+                                        + username
+                        )
+                );
+    }
+
+
+    // =========================
+    // ORDER → RESPONSE DTO
+    // =========================
+
+    private OrderResponseDto mapToResponse(Order order) {
+
+        OrderResponseDto response = new OrderResponseDto();
+
+        response.setId(order.getId());
+        response.setUserId(order.getUser().getId());
+        response.setStatus(order.getStatus());
+        response.setTotalAmount(order.getTotalAmount());
+        response.setCreatedAt(order.getCreatedAt());
+
+        List<OrderItemResponseDto> items =
+                order.getItems()
+                        .stream()
+                        .map(this::mapItemToResponse)
+                        .toList();
+
+        response.setItems(items);
+
+        return response;
+    }
+
+
+    // =========================
+    // ORDER ITEM → RESPONSE DTO
+    // =========================
+
+    private OrderItemResponseDto mapItemToResponse(OrderItem item) {
+
+        OrderItemResponseDto response =
+                new OrderItemResponseDto();
+
+        response.setId(item.getId());
+        response.setProductId(item.getProduct().getId());
+        response.setProductName(item.getProduct().getName());
+        response.setQuantity(item.getQuantity());
+        response.setPrice(item.getPrice());
+        response.setSubtotal(item.getSubtotal());
+
+        return response;
+    }
+}
