@@ -11,6 +11,7 @@ import com.shivamsikarwar.novacart.entity.Product;
 import com.shivamsikarwar.novacart.entity.User;
 import com.shivamsikarwar.novacart.exception.AuthenticatedUserNotFoundException;
 import com.shivamsikarwar.novacart.exception.InsufficientStockException;
+import com.shivamsikarwar.novacart.exception.InvalidOrderStatusException;
 import com.shivamsikarwar.novacart.exception.ResourceNotFoundException;
 import com.shivamsikarwar.novacart.repository.OrderRepository;
 import com.shivamsikarwar.novacart.repository.ProductRepository;
@@ -192,6 +193,55 @@ public class OrderService {
                 );
     }
 
+    @Transactional
+    public OrderResponseDto updateOrderStatus(
+            Long orderId,
+            OrderStatus newStatus) {
+
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Order not found with id: " + orderId
+                        )
+                );
+
+        OrderStatus currentStatus = order.getStatus();
+
+        if (!isValidTransition(currentStatus, newStatus)) {
+            throw new InvalidOrderStatusException(
+                    "Invalid order status transition: "
+                            + currentStatus + " -> " + newStatus
+            );
+        }
+
+        order.setStatus(newStatus);
+
+        Order updatedOrder = orderRepository.save(order);
+
+        return mapToResponse(updatedOrder);
+    }
+
+    private boolean isValidTransition(
+            OrderStatus currentStatus,
+            OrderStatus newStatus) {
+
+        return switch (currentStatus) {
+
+            case PENDING ->
+                    newStatus == OrderStatus.CONFIRMED
+                            || newStatus == OrderStatus.CANCELLED;
+
+            case CONFIRMED ->
+                    newStatus == OrderStatus.SHIPPED;
+
+            case SHIPPED ->
+                    newStatus == OrderStatus.DELIVERED;
+
+            case DELIVERED, CANCELLED ->
+                    false;
+        };
+    }
+
 
     // =========================
     // ORDER → RESPONSE DTO
@@ -216,6 +266,43 @@ public class OrderService {
         response.setItems(items);
 
         return response;
+    }
+
+    @Transactional
+    public OrderResponseDto cancelOrder(Long orderId) {
+
+        User user = getAuthenticatedUser();
+
+        Order order = orderRepository
+                .findByIdAndUserId(orderId, user.getId())
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Order not found with id: " + orderId
+                        )
+                );
+
+        if (order.getStatus() != OrderStatus.PENDING) {
+            throw new InvalidOrderStatusException(
+                    "Order cannot be cancelled when status is "
+                            + order.getStatus()
+            );
+        }
+
+        // Restore product stock
+        for (OrderItem item : order.getItems()) {
+
+            Product product = item.getProduct();
+
+            product.setStock(
+                    product.getStock() + item.getQuantity()
+            );
+        }
+
+        order.setStatus(OrderStatus.CANCELLED);
+
+        Order cancelledOrder = orderRepository.save(order);
+
+        return mapToResponse(cancelledOrder);
     }
 
 
