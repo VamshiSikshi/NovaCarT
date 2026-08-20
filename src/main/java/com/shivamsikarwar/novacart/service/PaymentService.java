@@ -5,6 +5,7 @@ import com.shivamsikarwar.novacart.dto.PaymentResponseDto;
 import com.shivamsikarwar.novacart.entity.*;
 import com.shivamsikarwar.novacart.exception.AuthenticatedUserNotFoundException;
 import com.shivamsikarwar.novacart.exception.InvalidPaymentException;
+import com.shivamsikarwar.novacart.exception.ResourceAlreadyExistsException;
 import com.shivamsikarwar.novacart.exception.ResourceNotFoundException;
 import com.shivamsikarwar.novacart.repository.OrderRepository;
 import com.shivamsikarwar.novacart.repository.PaymentRepository;
@@ -52,6 +53,11 @@ public class PaymentService {
             throw new InvalidPaymentException(
                     "Payment cannot be created for order with status: "
                             + order.getStatus()
+            );
+        }
+        if (paymentRepository.existsByOrder_Id(orderId)) {
+            throw new ResourceAlreadyExistsException(
+                    "Payment already exists for order: " + orderId
             );
         }
 
