@@ -1,9 +1,6 @@
 package com.shivamsikarwar.novacart.service;
 
-import com.shivamsikarwar.novacart.dto.OrderItemRequestDto;
-import com.shivamsikarwar.novacart.dto.OrderItemResponseDto;
-import com.shivamsikarwar.novacart.dto.OrderRequestDto;
-import com.shivamsikarwar.novacart.dto.OrderResponseDto;
+import com.shivamsikarwar.novacart.dto.*;
 import com.shivamsikarwar.novacart.entity.Order;
 import com.shivamsikarwar.novacart.entity.OrderItem;
 import com.shivamsikarwar.novacart.entity.OrderStatus;
@@ -242,32 +239,6 @@ public class OrderService {
         };
     }
 
-
-    // =========================
-    // ORDER → RESPONSE DTO
-    // =========================
-
-    private OrderResponseDto mapToResponse(Order order) {
-
-        OrderResponseDto response = new OrderResponseDto();
-
-        response.setId(order.getId());
-        response.setUserId(order.getUser().getId());
-        response.setStatus(order.getStatus());
-        response.setTotalAmount(order.getTotalAmount());
-        response.setCreatedAt(order.getCreatedAt());
-
-        List<OrderItemResponseDto> items =
-                order.getItems()
-                        .stream()
-                        .map(this::mapItemToResponse)
-                        .toList();
-
-        response.setItems(items);
-
-        return response;
-    }
-
     @Transactional
     public OrderResponseDto cancelOrder(Long orderId) {
 
@@ -303,6 +274,53 @@ public class OrderService {
         Order cancelledOrder = orderRepository.save(order);
 
         return mapToResponse(cancelledOrder);
+    }
+
+    @Transactional(readOnly = true)
+    public OrderStatusResponseDto getMyOrderStatus(Long orderId) {
+
+        User user = getAuthenticatedUser();
+
+        Order order = orderRepository
+                .findByIdAndUserId(orderId, user.getId())
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Order not found with id: " + orderId
+                        )
+                );
+
+        OrderStatusResponseDto response =
+                new OrderStatusResponseDto();
+
+        response.setOrderId(order.getId());
+        response.setStatus(order.getStatus());
+
+        return response;
+    }
+
+    // =========================
+    // ORDER → RESPONSE DTO
+    // =========================
+
+    private OrderResponseDto mapToResponse(Order order) {
+
+        OrderResponseDto response = new OrderResponseDto();
+
+        response.setId(order.getId());
+        response.setUserId(order.getUser().getId());
+        response.setStatus(order.getStatus());
+        response.setTotalAmount(order.getTotalAmount());
+        response.setCreatedAt(order.getCreatedAt());
+
+        List<OrderItemResponseDto> items =
+                order.getItems()
+                        .stream()
+                        .map(this::mapItemToResponse)
+                        .toList();
+
+        response.setItems(items);
+
+        return response;
     }
 
 
