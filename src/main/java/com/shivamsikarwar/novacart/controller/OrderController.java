@@ -2,6 +2,7 @@ package com.shivamsikarwar.novacart.controller;
 
 import com.shivamsikarwar.novacart.dto.OrderRequestDto;
 import com.shivamsikarwar.novacart.dto.OrderResponseDto;
+import com.shivamsikarwar.novacart.dto.OrderStatusResponseDto;
 import com.shivamsikarwar.novacart.dto.OrderStatusUpdateRequestDto;
 import com.shivamsikarwar.novacart.service.OrderService;
 import lombok.RequiredArgsConstructor;
@@ -86,6 +87,16 @@ public class OrderController {
                         orderId,
                         request.getStatus()
                 );
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{orderId}/status")
+    public ResponseEntity<OrderStatusResponseDto> getMyOrderStatus(
+            @PathVariable Long orderId) {
+
+        OrderStatusResponseDto response =
+                orderService.getMyOrderStatus(orderId);
 
         return ResponseEntity.ok(response);
     }
