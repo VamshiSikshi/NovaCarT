@@ -1,5 +1,6 @@
 package com.shivamsikarwar.novacart.controller;
 
+import com.shivamsikarwar.novacart.config.PaginationConfig;
 import com.shivamsikarwar.novacart.dto.ProductCategoryDto;
 import com.shivamsikarwar.novacart.dto.ProductRequestDto;
 import com.shivamsikarwar.novacart.dto.ProductResponseDto;
@@ -7,10 +8,12 @@ import com.shivamsikarwar.novacart.dto.ProductSummaryDto;
 import com.shivamsikarwar.novacart.service.ProductService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
@@ -58,8 +61,45 @@ public class ProductController {
     }
 
     @GetMapping("/search")
-    public List<ProductResponseDto> searchProducts(@RequestParam String keyword){
-        return productService.searchProducts(keyword);
+    public ResponseEntity<Page<ProductResponseDto>> searchProducts(
+
+            @RequestParam(required = false)
+            String keyword,
+
+            @RequestParam(required = false)
+            Long categoryId,
+
+            @RequestParam(required = false)
+            BigDecimal minPrice,
+
+            @RequestParam(required = false)
+            BigDecimal maxPrice,
+
+            @PageableDefault(
+                    page = 0,
+                    size = PaginationConfig.DEFAULT_PAGE_SIZE,
+                    sort = "name"
+            )
+            Pageable pageable) {
+
+        if (pageable.getPageSize() > PaginationConfig.MAX_PAGE_SIZE) {
+            pageable = PageRequest.of(
+                    pageable.getPageNumber(),
+                    PaginationConfig.MAX_PAGE_SIZE,
+                    pageable.getSort()
+            );
+        }
+
+
+        return ResponseEntity.ok(
+                productService.searchProducts(
+                        keyword,
+                        categoryId,
+                        minPrice,
+                        maxPrice,
+                        pageable
+                )
+        );
     }
 
     @GetMapping("/category/{categoryId}")
