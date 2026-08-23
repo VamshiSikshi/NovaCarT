@@ -1,15 +1,12 @@
 package com.shivamsikarwar.novacart.service;
 
 import com.shivamsikarwar.novacart.dto.*;
-import com.shivamsikarwar.novacart.entity.Order;
-import com.shivamsikarwar.novacart.entity.OrderItem;
-import com.shivamsikarwar.novacart.entity.OrderStatus;
-import com.shivamsikarwar.novacart.entity.Product;
-import com.shivamsikarwar.novacart.entity.User;
+import com.shivamsikarwar.novacart.entity.*;
 import com.shivamsikarwar.novacart.exception.AuthenticatedUserNotFoundException;
 import com.shivamsikarwar.novacart.exception.InsufficientStockException;
 import com.shivamsikarwar.novacart.exception.InvalidOrderStatusException;
 import com.shivamsikarwar.novacart.exception.ResourceNotFoundException;
+import com.shivamsikarwar.novacart.repository.AddressRepository;
 import com.shivamsikarwar.novacart.repository.OrderRepository;
 import com.shivamsikarwar.novacart.repository.ProductRepository;
 import com.shivamsikarwar.novacart.repository.UserRepository;
@@ -29,6 +26,7 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final ProductRepository productRepository;
     private final UserRepository userRepository;
+    private final AddressRepository addressRepository;
 
 
     // =========================
@@ -49,10 +47,30 @@ public class OrderService {
 
         User user = getAuthenticatedUser();
 
+        Address address = addressRepository
+                .findByIdAndUserId(
+                        request.getAddressId(),
+                        user.getId()
+                )
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Address not found with id: "
+                                        + request.getAddressId()
+                        )
+                );
+
         Order order = new Order();
 
         order.setUser(user);
         order.setStatus(OrderStatus.PENDING);
+
+        order.setShippingFullName(address.getFullName());
+        order.setShippingPhone(address.getPhone());
+        order.setShippingAddressLine(address.getAddressLine());
+        order.setShippingCity(address.getCity());
+        order.setShippingState(address.getState());
+        order.setShippingPostalCode(address.getPostalCode());
+        order.setShippingCountry(address.getCountry());
 
         BigDecimal totalAmount = BigDecimal.ZERO;
 
@@ -311,6 +329,34 @@ public class OrderService {
         response.setStatus(order.getStatus());
         response.setTotalAmount(order.getTotalAmount());
         response.setCreatedAt(order.getCreatedAt());
+
+        response.setShippingFullName(
+                order.getShippingFullName()
+        );
+
+        response.setShippingPhone(
+                order.getShippingPhone()
+        );
+
+        response.setShippingAddressLine(
+                order.getShippingAddressLine()
+        );
+
+        response.setShippingCity(
+                order.getShippingCity()
+        );
+
+        response.setShippingState(
+                order.getShippingState()
+        );
+
+        response.setShippingPostalCode(
+                order.getShippingPostalCode()
+        );
+
+        response.setShippingCountry(
+                order.getShippingCountry()
+        );
 
         List<OrderItemResponseDto> items =
                 order.getItems()
