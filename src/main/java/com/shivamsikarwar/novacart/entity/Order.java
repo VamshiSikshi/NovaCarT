@@ -33,6 +33,29 @@ public class Order {
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
+
+    @Column(nullable = false)
+    private String shippingFullName;
+
+    @Column(nullable = false)
+    private String shippingPhone;
+
+    @Column(nullable = false)
+    private String shippingAddressLine;
+
+    @Column(nullable = false)
+    private String shippingCity;
+
+    @Column(nullable = false)
+    private String shippingState;
+
+    @Column(nullable = false)
+    private String shippingPostalCode;
+
+    @Column(nullable = false)
+    private String shippingCountry;
+    
+
     @OneToMany(
             mappedBy = "order",
             cascade = CascadeType.ALL,
