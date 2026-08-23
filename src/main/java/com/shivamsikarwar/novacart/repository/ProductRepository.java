@@ -4,22 +4,25 @@ import com.shivamsikarwar.novacart.dto.ProductCategoryDto;
 import com.shivamsikarwar.novacart.dto.ProductSummaryDto;
 import com.shivamsikarwar.novacart.entity.Product;
 import jakarta.transaction.Transactional;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.*;
 import org.springframework.data.repository.query.Param;
 
 import java.math.BigDecimal;
 import java.util.List;
 
-public interface ProductRepository extends JpaRepository<Product,Long>, JpaSpecificationExecutor<Product> {
+public interface ProductRepository
+        extends JpaRepository<Product, Long>,
+        JpaSpecificationExecutor<Product> {
 
+    List<Product> findByNameContainingIgnoreCase(
+            String keyword);
 
-    List<Product> findByNameContainingIgnoreCase(String keyword);
+    List<Product> findByCategoryId(
+            Long categoryId);
 
-    List<Product> findByCategoryId(Long categoryId);
-    List<Product> findByPriceBetween(BigDecimal minPrice, BigDecimal maxPrice);
+    List<Product> findByPriceBetween(
+            BigDecimal minPrice,
+            BigDecimal maxPrice);
 
     @Query("""
             SELECT p
@@ -27,15 +30,14 @@ public interface ProductRepository extends JpaRepository<Product,Long>, JpaSpeci
             WHERE p.price > :price
             """)
     List<Product> findProductsWithPriceGreaterThan(
-            @Param("price") BigDecimal price
-    );
+            @Param("price") BigDecimal price);
 
     @Query("""
-    SELECT p
-    FROM Product p
-    WHERE LOWER(p.name)
-    LIKE LOWER(CONCAT('%', :keyword, '%'))
-    """)
+            SELECT p
+            FROM Product p
+            WHERE LOWER(p.name)
+            LIKE LOWER(CONCAT('%', :keyword, '%'))
+            """)
     List<Product> searchProducts(
             @Param("keyword") String keyword);
 
@@ -78,9 +80,9 @@ public interface ProductRepository extends JpaRepository<Product,Long>, JpaSpeci
 
     @Query("""
             SELECT new com.shivamsikarwar.novacart.dto.ProductSummaryDto(
-            p.id,
-            p.name,
-            p.price
+                p.id,
+                p.name,
+                p.price
             )
             FROM Product p
             """)
@@ -88,9 +90,9 @@ public interface ProductRepository extends JpaRepository<Product,Long>, JpaSpeci
 
     @Query("""
             SELECT new com.shivamsikarwar.novacart.dto.ProductCategoryDto(
-            p.name,
-            p.price,
-            c.name
+                p.name,
+                p.price,
+                c.name
             )
             FROM Product p
             JOIN p.category c
@@ -111,28 +113,30 @@ public interface ProductRepository extends JpaRepository<Product,Long>, JpaSpeci
     )
     @Query("""
             UPDATE Product p
-            SET p.price =p.price*1.1
+            SET p.price = p.price * 1.1
             """)
     int increaseAllPrices();
 
     @Transactional
     @Modifying
     @Query("""
-            DELETE 
+            DELETE
             FROM Product p
-            WHERE p.stock=0
+            WHERE p.stock = 0
             """)
     int deleteOutOfStockProducts();
 
-    @Query(value="""
-           SELECT *
-           FROM products
-           WHERE stock > :stock 
-            """,
-            nativeQuery = true)
-    List<Product> findAvailableProducts(@Param("stock") Integer stock);
+    @Query(
+            value = """
+                    SELECT *
+                    FROM products
+                    WHERE stock > :stock
+                    """,
+            nativeQuery = true
+    )
+    List<Product> findAvailableProducts(
+            @Param("stock") Integer stock);
 
     @EntityGraph(attributePaths = "category")
     List<Product> findAllBy();
 }
-

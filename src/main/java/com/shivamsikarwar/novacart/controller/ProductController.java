@@ -22,20 +22,29 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/products")
 public class ProductController {
+
     private final ProductService productService;
 
-    public ProductController(ProductService productService){
-        this.productService=productService;
+    public ProductController(ProductService productService) {
+        this.productService = productService;
     }
 
     @PostMapping
-    public ProductResponseDto createProduct(@Valid @RequestBody ProductRequestDto request){
+    public ProductResponseDto createProduct(
+            @Valid @RequestBody ProductRequestDto request) {
+
         return productService.createProduct(request);
     }
 
     @GetMapping
     public Page<ProductResponseDto> getAllProducts(
-        @PageableDefault(size=10,sort="id", direction= Sort.Direction.DESC) Pageable pageable){
+            @PageableDefault(
+                    size = 10,
+                    sort = "id",
+                    direction = Sort.Direction.DESC
+            )
+            Pageable pageable) {
+
         return productService.getAllProducts(pageable);
     }
 
@@ -57,8 +66,13 @@ public class ProductController {
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteProduct(@PathVariable Long id) {
+
         productService.deleteProduct(id);
     }
+
+    // =========================
+    // SEARCH + FILTER + PAGINATION
+    // =========================
 
     @GetMapping("/search")
     public ResponseEntity<Page<ProductResponseDto>> searchProducts(
@@ -82,14 +96,15 @@ public class ProductController {
             )
             Pageable pageable) {
 
-        if (pageable.getPageSize() > PaginationConfig.MAX_PAGE_SIZE) {
+        if (pageable.getPageSize() >
+                PaginationConfig.MAX_PAGE_SIZE) {
+
             pageable = PageRequest.of(
                     pageable.getPageNumber(),
                     PaginationConfig.MAX_PAGE_SIZE,
                     pageable.getSort()
             );
         }
-
 
         return ResponseEntity.ok(
                 productService.searchProducts(
@@ -102,110 +117,133 @@ public class ProductController {
         );
     }
 
+    // =========================
+    // CATEGORY
+    // =========================
+
     @GetMapping("/category/{categoryId}")
-    public List<ProductResponseDto> getProductsByCategory(@PathVariable Long categoryId){
+    public List<ProductResponseDto> getProductsByCategory(
+            @PathVariable Long categoryId) {
+
         return productService.getProductsByCategory(categoryId);
     }
+
+    // =========================
+    // PRICE RANGE
+    // =========================
 
     @GetMapping("/price-range")
     public List<ProductResponseDto> filterProductsByPrice(
             @RequestParam BigDecimal minPrice,
-            @RequestParam BigDecimal maxPrice){
-        return productService.filterProductsByPrice(minPrice, maxPrice);
-    }
+            @RequestParam BigDecimal maxPrice) {
 
-    @GetMapping("/expensive")
-    public List<ProductResponseDto> getExpensiveProducts(@RequestParam BigDecimal price){
-        return productService.getExpensiveProducts(price);
-    }
-
-    @GetMapping("/expensive-first")
-    public List<ProductResponseDto> getProductsByPriceDesc(){
-        return productService.getProductsByPriceDesc();
-    }
-
-    @GetMapping("/count")
-    public Long countProducts(){
-        return productService.countProducts();
-    }
-
-    @GetMapping("/highest-price")
-    public BigDecimal getHighestPrice(){
-        return productService.getHighestPrice();
-    }
-
-    @GetMapping("/lowest-price")
-    public BigDecimal getLowestPrice(){
-        return productService.getLowestPrice();
-    }
-
-    @GetMapping("/average-price")
-    public Double getAveragePrice(){
-        return productService.getAveragePrice();
-    }
-
-    @GetMapping("/total-stock")
-    public Long getTotalStock(){
-        return productService.getTotalStock();
-    }
-
-    @GetMapping("/summary")
-    public List<ProductSummaryDto> getProductsSummaries(){
-        return productService.getProductSummaries();
-    }
-
-    @GetMapping("/with-category")
-    public List<ProductCategoryDto> getProductsWithCategory(){
-        return productService.getProductsWithCategory();
-    }
-
-    @GetMapping("/with-category-fetch")
-    public List<ProductResponseDto> getAllProductsWithCategory(){
-        return productService.getAllProductsWithCategory();
-    }
-
-    @PutMapping("/increase-price")
-    public String increaseAllPrices(){
-        int updateRows= productService.increaseAllPrices();
-        return updateRows+" products updated,";
-    }
-
-    @DeleteMapping("/out-of-stock")
-    public String deleteOutOfStockProduct(){
-        int deleteRows= productService.deleteOutOfStockProducts();
-        return deleteRows + " products deleted.";
-    }
-
-    @GetMapping("/available")
-    public List<ProductResponseDto> getAvailableProducts(@RequestParam Integer stock){
-        return productService.getAvailableProducts(stock);
-    }
-
-    @GetMapping("/filter")
-    public List<ProductResponseDto> filterProducts(
-
-            @RequestParam(required = false)
-            String keyword,
-
-            @RequestParam(required = false)
-            Long categoryId,
-
-            @RequestParam(required = false)
-            BigDecimal minPrice,
-
-            @RequestParam(required = false)
-            BigDecimal maxPrice) {
-
-        return productService.searchProducts(
-                keyword,
-                categoryId,
+        return productService.filterProductsByPrice(
                 minPrice,
                 maxPrice
         );
     }
 
+    // =========================
+    // EXPENSIVE PRODUCTS
+    // =========================
+
+    @GetMapping("/expensive")
+    public List<ProductResponseDto> getExpensiveProducts(
+            @RequestParam BigDecimal price) {
+
+        return productService.getExpensiveProducts(price);
+    }
+
+    @GetMapping("/expensive-first")
+    public List<ProductResponseDto> getProductsByPriceDesc() {
+
+        return productService.getProductByPriceDesc();
+    }
+
+    // =========================
+    // STATISTICS
+    // =========================
+
+    @GetMapping("/count")
+    public Long countProducts() {
+
+        return productService.countProducts();
+    }
+
+    @GetMapping("/highest-price")
+    public BigDecimal getHighestPrice() {
+
+        return productService.getHighestPrice();
+    }
+
+    @GetMapping("/lowest-price")
+    public BigDecimal getLowestPrice() {
+
+        return productService.getLowestPrice();
+    }
+
+    @GetMapping("/average-price")
+    public Double getAveragePrice() {
+
+        return productService.getAveragePrice();
+    }
+
+    @GetMapping("/total-stock")
+    public Long getTotalStock() {
+
+        return productService.getTotalStock();
+    }
+
+    // =========================
+    // DTO PROJECTIONS
+    // =========================
+
+    @GetMapping("/summary")
+    public List<ProductSummaryDto> getProductsSummaries() {
+
+        return productService.getProductSummaries();
+    }
+
+    @GetMapping("/with-category")
+    public List<ProductCategoryDto> getProductsWithCategory() {
+
+        return productService.getProductWithCategory();
+    }
+
+    // =========================
+    // FETCH JOIN
+    // =========================
+
+    @GetMapping("/with-category-fetch")
+    public List<ProductResponseDto> getAllProductsWithCategory() {
+
+        return productService.getAllProductWithCategory();
+    }
+
+    @PutMapping("/increase-price")
+    public String increaseAllPrices() {
+        int updateRows = productService.increaseAllPrices();
+        return updateRows + " products updated,";
+    }
+
+    @DeleteMapping("/out-of-stock")
+    public String deleteOutOfStockProduct() {
+        int deleteRows =
+                productService.deleteOutOfStockProducts();
+
+        return deleteRows + " products deleted.";
+    }
+
+    @GetMapping("/available")
+    public List<ProductResponseDto> getAvailableProducts(
+            @RequestParam Integer stock) {
+
+        return productService.getAvailableProducts(stock);
+    }
+
     @GetMapping("/with-category-graph")
-    public List<ProductResponseDto> getAllProductsWithEntityGraph(){
+    public List<ProductResponseDto> getAllProductsWithEntityGraph() {
+
         return productService.getAllProductsWithEntityGraph();
     }
 }
