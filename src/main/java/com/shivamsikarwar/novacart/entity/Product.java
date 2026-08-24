@@ -18,7 +18,24 @@ import java.time.LocalDateTime;
 @Setter
 @Entity
 @EntityListeners(AuditingEntityListener.class)
-@Table(name="products")
+@Table(
+        name = "products",
+        indexes = {
+                @Index(
+                        name = "idx_product_category",
+                        columnList = "category_id"
+                ),
+                @Index(
+                        name = "idx_product_price",
+                        columnList = "price"
+                ),
+                @Index(
+                        name = "idx_product_stock",
+                        columnList = "stock"
+                )
+        }
+)
+
 public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

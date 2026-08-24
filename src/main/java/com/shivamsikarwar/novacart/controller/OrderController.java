@@ -1,11 +1,12 @@
 package com.shivamsikarwar.novacart.controller;
 
-import com.shivamsikarwar.novacart.dto.OrderRequestDto;
-import com.shivamsikarwar.novacart.dto.OrderResponseDto;
-import com.shivamsikarwar.novacart.dto.OrderStatusResponseDto;
-import com.shivamsikarwar.novacart.dto.OrderStatusUpdateRequestDto;
+import com.shivamsikarwar.novacart.dto.*;
 import com.shivamsikarwar.novacart.service.OrderService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -99,5 +100,20 @@ public class OrderController {
                 orderService.getMyOrderStatus(orderId);
 
         return ResponseEntity.ok(response);
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/admin")
+    public ResponseEntity<Page<AdminOrderResponseDto>> getAllOrders(
+            @PageableDefault(
+                    size = 10,
+                    sort = "createdAt",
+                    direction = Sort.Direction.DESC
+            )
+            Pageable pageable) {
+
+        return ResponseEntity.ok(
+                orderService.getAllOrders(pageable)
+        );
     }
 }
