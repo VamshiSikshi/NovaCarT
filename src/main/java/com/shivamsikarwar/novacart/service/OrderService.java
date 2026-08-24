@@ -11,6 +11,9 @@ import com.shivamsikarwar.novacart.repository.OrderRepository;
 import com.shivamsikarwar.novacart.repository.ProductRepository;
 import com.shivamsikarwar.novacart.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -149,7 +152,7 @@ public class OrderService {
         User user = getAuthenticatedUser();
 
         return orderRepository
-                .findByUserIdOrderByCreatedAtDesc(user.getId())
+                .findMyOrdersWithItems(user.getId())
                 .stream()
                 .map(this::mapToResponse)
                 .toList();
@@ -316,6 +319,16 @@ public class OrderService {
         return response;
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
+    @Transactional(readOnly = true)
+    public Page<AdminOrderResponseDto> getAllOrders(
+            Pageable pageable) {
+
+        return orderRepository
+                .findAllByOrderByCreatedAtDesc(pageable)
+                .map(this::mapToAdminResponse);
+    }
+
     // =========================
     // ORDER → RESPONSE DTO
     // =========================
@@ -385,6 +398,21 @@ public class OrderService {
         response.setQuantity(item.getQuantity());
         response.setPrice(item.getPrice());
         response.setSubtotal(item.getSubtotal());
+
+        return response;
+    }
+
+    private AdminOrderResponseDto mapToAdminResponse(Order order) {
+
+        AdminOrderResponseDto response =
+                new AdminOrderResponseDto();
+
+        response.setOrderId(order.getId());
+        response.setUserId(order.getUser().getId());
+        response.setUsername(order.getUser().getUsername());
+        response.setStatus(order.getStatus());
+        response.setTotalAmount(order.getTotalAmount());
+        response.setCreatedAt(order.getCreatedAt());
 
         return response;
     }

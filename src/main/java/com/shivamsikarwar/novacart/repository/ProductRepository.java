@@ -4,6 +4,8 @@ import com.shivamsikarwar.novacart.dto.ProductCategoryDto;
 import com.shivamsikarwar.novacart.dto.ProductSummaryDto;
 import com.shivamsikarwar.novacart.entity.Product;
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.*;
 import org.springframework.data.repository.query.Param;
 
@@ -23,6 +25,8 @@ public interface ProductRepository
     List<Product> findByPriceBetween(
             BigDecimal minPrice,
             BigDecimal maxPrice);
+
+    List<Product> findByStockLessThanEqualOrderByStockAsc(Integer stock);
 
     @Query("""
             SELECT p
@@ -99,12 +103,6 @@ public interface ProductRepository
             """)
     List<ProductCategoryDto> getProductWithCategory();
 
-    @Query("""
-            SELECT p
-            FROM Product p
-            JOIN FETCH p.category
-            """)
-    List<Product> findAllWithCategory();
 
     @Transactional
     @Modifying(
@@ -138,5 +136,12 @@ public interface ProductRepository
             @Param("stock") Integer stock);
 
     @EntityGraph(attributePaths = "category")
-    List<Product> findAllBy();
+    @Query("SELECT p FROM Product p")
+    List<Product> findAllWithCategory();
+
+    @EntityGraph(attributePaths = "category")
+    @Query("SELECT p FROM Product p")
+    Page<Product> findAllWithCategory(Pageable pageable);
+
+    long countByStockLessThanEqual(Integer stock);
 }

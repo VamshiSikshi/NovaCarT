@@ -10,7 +10,7 @@ import com.shivamsikarwar.novacart.exception.ResourceNotFoundException;
 import com.shivamsikarwar.novacart.repository.CategoryRepository;
 import com.shivamsikarwar.novacart.repository.ProductRepository;
 import com.shivamsikarwar.novacart.specification.ProductSpecification;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
@@ -57,7 +57,8 @@ public class ProductService {
             Pageable pageable) {
 
         Page<Product> productPage =
-                productRepository.findAll(pageable);
+                productRepository.findAllWithCategory(pageable);
+
 
         return productPage.map(this::toResponseDto);
     }
@@ -327,13 +328,50 @@ public class ProductService {
     public List<ProductResponseDto> getAllProductsWithEntityGraph() {
 
         return productRepository
-                .findAllBy()
+                .findAllWithCategory()
                 .stream()
                 .map(this::toResponseDto)
                 .toList();
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
+    @Transactional(readOnly = true)
+    public List<ProductResponseDto> getLowStockProducts(Integer threshold) {
 
+        if (threshold == null || threshold < 0) {
+            throw new IllegalArgumentException(
+                    "Stock threshold cannot be negative"
+            );
+        }
+
+        return productRepository
+                .findByStockLessThanEqualOrderByStockAsc(threshold)
+                .stream()
+                .map(this::toResponseDto)
+                .toList();
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @Transactional
+    public ProductResponseDto updateStock(
+            Long productId,
+            Integer stock) {
+
+        if (stock == null || stock < 0) {
+            throw new IllegalArgumentException(
+                    "Stock cannot be negative"
+            );
+        }
+
+        Product product = findProductById(productId);
+
+        product.setStock(stock);
+
+        Product updatedProduct =
+                productRepository.save(product);
+
+        return toResponseDto(updatedProduct);
+    }
 
     private ProductResponseDto toResponseDto(
             Product product) {
