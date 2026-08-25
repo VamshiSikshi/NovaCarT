@@ -26,7 +26,6 @@ public class AdminOrderService {
     // GET ALL ORDERS
     // =========================
 
-    @PreAuthorize("hasRole('ADMIN')")
     @Transactional(readOnly = true)
     public Page<AdminOrderSummaryDto> getAllOrders(
             Pageable pageable) {

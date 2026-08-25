@@ -2,11 +2,8 @@ package com.shivamsikarwar.novacart.controller;
 
 import com.shivamsikarwar.novacart.dto.*;
 import com.shivamsikarwar.novacart.service.OrderService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -28,7 +25,7 @@ public class OrderController {
 
     @PostMapping
     public ResponseEntity<OrderResponseDto> createOrder(
-            @RequestBody OrderRequestDto request) {
+            @Valid @RequestBody OrderRequestDto request) {
 
         OrderResponseDto response =
                 orderService.createOrder(request);
@@ -100,20 +97,5 @@ public class OrderController {
                 orderService.getMyOrderStatus(orderId);
 
         return ResponseEntity.ok(response);
-    }
-
-    @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("/admin")
-    public ResponseEntity<Page<AdminOrderResponseDto>> getAllOrders(
-            @PageableDefault(
-                    size = 10,
-                    sort = "createdAt",
-                    direction = Sort.Direction.DESC
-            )
-            Pageable pageable) {
-
-        return ResponseEntity.ok(
-                orderService.getAllOrders(pageable)
-        );
     }
 }

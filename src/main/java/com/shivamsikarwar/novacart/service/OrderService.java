@@ -7,13 +7,11 @@ import com.shivamsikarwar.novacart.exception.InsufficientStockException;
 import com.shivamsikarwar.novacart.exception.InvalidOrderStatusException;
 import com.shivamsikarwar.novacart.exception.ResourceNotFoundException;
 import com.shivamsikarwar.novacart.repository.AddressRepository;
+import com.shivamsikarwar.novacart.repository.CartRepository;
 import com.shivamsikarwar.novacart.repository.OrderRepository;
 import com.shivamsikarwar.novacart.repository.ProductRepository;
 import com.shivamsikarwar.novacart.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -30,6 +28,7 @@ public class OrderService {
     private final ProductRepository productRepository;
     private final UserRepository userRepository;
     private final AddressRepository addressRepository;
+    private final CartRepository cartRepository;
 
 
     // =========================
@@ -137,6 +136,12 @@ public class OrderService {
         order.setTotalAmount(totalAmount);
 
         Order savedOrder = orderRepository.save(order);
+
+        cartRepository.findByUserId(user.getId())
+                .ifPresent(cart -> {
+                    cart.getItems().clear();
+                    cartRepository.save(cart);
+                });
 
         return mapToResponse(savedOrder);
     }
@@ -317,16 +322,6 @@ public class OrderService {
         response.setStatus(order.getStatus());
 
         return response;
-    }
-
-    @PreAuthorize("hasRole('ADMIN')")
-    @Transactional(readOnly = true)
-    public Page<AdminOrderResponseDto> getAllOrders(
-            Pageable pageable) {
-
-        return orderRepository
-                .findAllByOrderByCreatedAtDesc(pageable)
-                .map(this::mapToAdminResponse);
     }
 
     // =========================
