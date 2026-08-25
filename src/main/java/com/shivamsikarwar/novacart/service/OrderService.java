@@ -7,6 +7,7 @@ import com.shivamsikarwar.novacart.exception.InsufficientStockException;
 import com.shivamsikarwar.novacart.exception.InvalidOrderStatusException;
 import com.shivamsikarwar.novacart.exception.ResourceNotFoundException;
 import com.shivamsikarwar.novacart.repository.AddressRepository;
+import com.shivamsikarwar.novacart.repository.CartRepository;
 import com.shivamsikarwar.novacart.repository.OrderRepository;
 import com.shivamsikarwar.novacart.repository.ProductRepository;
 import com.shivamsikarwar.novacart.repository.UserRepository;
@@ -27,6 +28,7 @@ public class OrderService {
     private final ProductRepository productRepository;
     private final UserRepository userRepository;
     private final AddressRepository addressRepository;
+    private final CartRepository cartRepository;
 
 
     // =========================
@@ -134,6 +136,12 @@ public class OrderService {
         order.setTotalAmount(totalAmount);
 
         Order savedOrder = orderRepository.save(order);
+
+        cartRepository.findByUserId(user.getId())
+                .ifPresent(cart -> {
+                    cart.getItems().clear();
+                    cartRepository.save(cart);
+                });
 
         return mapToResponse(savedOrder);
     }
