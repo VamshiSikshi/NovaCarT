@@ -4,6 +4,7 @@ import com.shivamsikarwar.novacart.entity.Role;
 import com.shivamsikarwar.novacart.entity.User;
 import com.shivamsikarwar.novacart.repository.AddressRepository;
 import com.shivamsikarwar.novacart.repository.UserRepository;
+import com.shivamsikarwar.novacart.support.DatabaseCleanup;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,10 +37,12 @@ class AuthControllerIntegrationTest {
     @Autowired
     private AddressRepository addressRepository;
 
+    @Autowired
+    private DatabaseCleanup databaseCleanup;
+
     @BeforeEach
     void setUp() {
-        addressRepository.deleteAll();
-        userRepository.deleteAll();
+        databaseCleanup.clean();
 
         User user = new User();
         user.setUsername("testuser");
