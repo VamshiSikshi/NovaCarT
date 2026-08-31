@@ -4,8 +4,11 @@ import com.shivamsikarwar.novacart.dto.UserRequestDto;
 import com.shivamsikarwar.novacart.dto.UserResponseDto;
 import com.shivamsikarwar.novacart.entity.Role;
 import com.shivamsikarwar.novacart.entity.User;
+import com.shivamsikarwar.novacart.exception.AuthenticatedUserNotFoundException;
 import com.shivamsikarwar.novacart.exception.ResourceAlreadyExistsException;
 import com.shivamsikarwar.novacart.repository.UserRepository;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -45,8 +48,8 @@ public class UserService {
         return toResponseDto(savedUser);
     }
 
-    public UserResponseDto toResponseDto(User user){
-        UserResponseDto response=new UserResponseDto();
+    public UserResponseDto toResponseDto(User user) {
+        UserResponseDto response = new UserResponseDto();
 
         response.setId(user.getId());
         response.setUsername(user.getUsername());
@@ -54,5 +57,25 @@ public class UserService {
         response.setRole(user.getRole());
 
         return response;
+    }
+
+    public UserResponseDto getCurrentUser() {
+
+        Authentication authentication =
+                SecurityContextHolder
+                        .getContext()
+                        .getAuthentication();
+
+        String username = authentication.getName();
+
+        User user = userRepository
+                .findByUsername(username)
+                .orElseThrow(() ->
+                        new AuthenticatedUserNotFoundException(
+                                "Authenticated user not found: " + username
+                        )
+                );
+
+        return toResponseDto(user);
     }
 }
