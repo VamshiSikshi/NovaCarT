@@ -2,6 +2,35 @@ import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import api from '../../../api/axios'
 
+const formatCurrency = (amount) =>
+  `₹${Number(amount || 0).toLocaleString('en-IN')}`
+
+const formatDate = (date) => {
+  if (!date) return '—'
+
+  return new Date(date).toLocaleString('en-IN', {
+    dateStyle: 'medium',
+    timeStyle: 'short',
+  })
+}
+
+const getStatusClass = (status) => {
+  switch (status) {
+    case 'PENDING':
+      return 'status-pending'
+    case 'CONFIRMED':
+      return 'status-confirmed'
+    case 'SHIPPED':
+      return 'status-shipped'
+    case 'DELIVERED':
+      return 'status-delivered'
+    case 'CANCELLED':
+      return 'status-cancelled'
+    default:
+      return ''
+  }
+}
+
 function AdminOrderDetailsPage() {
   const { orderId } = useParams()
 
@@ -9,6 +38,7 @@ function AdminOrderDetailsPage() {
   const [selectedStatus, setSelectedStatus] = useState('')
   const [loading, setLoading] = useState(true)
   const [updating, setUpdating] = useState(false)
+
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
 
@@ -44,7 +74,9 @@ function AdminOrderDetailsPage() {
     }
 
     if (selectedStatus === order.status) {
-      setError('Please select a different status.')
+      setError(
+        'Please select a different status.'
+      )
       return
     }
 
@@ -63,7 +95,9 @@ function AdminOrderDetailsPage() {
       setOrder(response.data)
       setSelectedStatus(response.data.status)
 
-      setSuccess('Order status updated successfully.')
+      setSuccess(
+        'Order status updated successfully.'
+      )
     } catch (error) {
       setError(
         error.response?.data?.message ||
@@ -75,122 +109,276 @@ function AdminOrderDetailsPage() {
   }
 
   if (loading) {
-    return <p>Loading order...</p>
+    return (
+      <div className="admin-state">
+        <p>Loading order...</p>
+      </div>
+    )
   }
 
   if (error && !order) {
-    return <p>{error}</p>
+    return (
+      <div className="admin-state admin-state-error">
+        <p>{error}</p>
+      </div>
+    )
   }
 
   if (!order) {
-    return <p>Order not found.</p>
+    return (
+      <div className="admin-state">
+        <p>Order not found.</p>
+      </div>
+    )
   }
 
   return (
-    <div>
-      <h1>Admin Order Details</h1>
+    <div className="admin-order-details-page">
+      <div className="admin-page-heading">
+        <p className="admin-page-eyebrow">
+          ORDER MANAGEMENT
+        </p>
 
-      {error && <p>{error}</p>}
+        <div className="admin-order-details-title">
+          <div>
+            <h2>Order #{order.id}</h2>
 
-      {success && <p>{success}</p>}
-
-      <h2>Order #{order.id}</h2>
-
-      <p>
-        User ID: {order.userId}
-      </p>
-
-      <p>
-        Current Status: {order.status}
-      </p>
-
-      <p>
-        Total: ₹{order.totalAmount}
-      </p>
-
-      <p>
-        Created At: {order.createdAt}
-      </p>
-
-      <section>
-        <h2>Update Order Status</h2>
-
-        <select
-          value={selectedStatus}
-          onChange={(event) =>
-            setSelectedStatus(event.target.value)
-          }
-          disabled={updating}
-        >
-          <option value="PENDING">PENDING</option>
-          <option value="CONFIRMED">CONFIRMED</option>
-          <option value="SHIPPED">SHIPPED</option>
-          <option value="DELIVERED">DELIVERED</option>
-          <option value="CANCELLED">CANCELLED</option>
-        </select>
-
-        <button
-          type="button"
-          onClick={updateOrderStatus}
-          disabled={
-            updating ||
-            selectedStatus === order.status
-          }
-        >
-          {updating
-            ? 'Updating...'
-            : 'Update Status'}
-        </button>
-      </section>
-
-      <section>
-        <h2>Items</h2>
-
-        {order.items.map((item) => (
-          <div key={item.id}>
-            <h3>{item.productName}</h3>
-
-            <p>
-              Product ID: {item.productId}
-            </p>
-
-            <p>
-              Price: ₹{item.price}
-            </p>
-
-            <p>
-              Quantity: {item.quantity}
-            </p>
-
-            <p>
-              Subtotal: ₹{item.subtotal}
+            <p className="admin-page-description">
+              Review order information and update its
+              current status.
             </p>
           </div>
-        ))}
+
+          <span
+            className={`admin-status-badge admin-status-large ${getStatusClass(
+              order.status
+            )}`}
+          >
+            {order.status}
+          </span>
+        </div>
+      </div>
+
+      {error && (
+        <div className="admin-alert admin-alert-error">
+          {error}
+        </div>
+      )}
+
+      {success && (
+        <div className="admin-alert admin-alert-success">
+          {success}
+        </div>
+      )}
+
+      <section className="admin-order-summary-grid">
+        <div className="admin-panel admin-order-summary-card">
+          <span className="admin-summary-label">
+            Customer
+          </span>
+
+          <strong>
+            User #{order.userId}
+          </strong>
+
+          <p>
+            Customer account
+          </p>
+        </div>
+
+        <div className="admin-panel admin-order-summary-card">
+          <span className="admin-summary-label">
+            Order Total
+          </span>
+
+          <strong>
+            {formatCurrency(order.totalAmount)}
+          </strong>
+
+          <p>
+            {order.items?.length || 0}{' '}
+            {order.items?.length === 1
+              ? 'item'
+              : 'items'}
+          </p>
+        </div>
+
+        <div className="admin-panel admin-order-summary-card">
+          <span className="admin-summary-label">
+            Created
+          </span>
+
+          <strong>
+            {formatDate(order.createdAt)}
+          </strong>
+
+          <p>
+            Order #{order.id}
+          </p>
+        </div>
       </section>
 
-      <section>
-        <h2>Shipping Address</h2>
+      <section className="admin-panel admin-status-panel">
+        <div className="admin-panel-header">
+          <div>
+            <h3>Update Order Status</h3>
 
-        <p>
-          <strong>{order.shippingFullName}</strong>
-        </p>
+            <p>
+              Change the order's current fulfillment
+              status.
+            </p>
+          </div>
+        </div>
 
-        <p>{order.shippingPhone}</p>
+        <div className="admin-status-form">
+          <div>
+            <label htmlFor="selected-status">
+              Status
+            </label>
 
-        <p>{order.shippingAddressLine}</p>
+            <select
+              id="selected-status"
+              value={selectedStatus}
+              onChange={(event) =>
+                setSelectedStatus(event.target.value)
+              }
+              disabled={updating}
+            >
+              <option value="PENDING">
+                PENDING
+              </option>
 
-        <p>
-          {order.shippingCity}, {order.shippingState}
-        </p>
+              <option value="CONFIRMED">
+                CONFIRMED
+              </option>
 
-        <p>
-          {order.shippingPostalCode}, {order.shippingCountry}
-        </p>
+              <option value="SHIPPED">
+                SHIPPED
+              </option>
+
+              <option value="DELIVERED">
+                DELIVERED
+              </option>
+
+              <option value="CANCELLED">
+                CANCELLED
+              </option>
+            </select>
+          </div>
+
+          <button
+            type="button"
+            className="admin-primary-button"
+            onClick={updateOrderStatus}
+            disabled={
+              updating ||
+              selectedStatus === order.status
+            }
+          >
+            {updating
+              ? 'Updating...'
+              : 'Update Status'}
+          </button>
+        </div>
       </section>
 
-      <Link to="/admin/orders">
-        Back to Admin Orders
+      <section className="admin-panel admin-items-panel">
+        <div className="admin-panel-header">
+          <div>
+            <h3>Order Items</h3>
+
+            <p>
+              Products included in this order.
+            </p>
+          </div>
+
+          <span className="admin-panel-total">
+            {order.items?.length || 0} items
+          </span>
+        </div>
+
+        <div className="admin-order-items">
+          {order.items.map((item) => (
+            <div
+              className="admin-order-item"
+              key={item.id}
+            >
+              <div className="admin-order-item-main">
+                <strong>
+                  {item.productName}
+                </strong>
+
+                <span>
+                  Product ID: {item.productId}
+                </span>
+              </div>
+
+              <div className="admin-order-item-detail">
+                <span>Price</span>
+                <strong>
+                  {formatCurrency(item.price)}
+                </strong>
+              </div>
+
+              <div className="admin-order-item-detail">
+                <span>Quantity</span>
+                <strong>
+                  {item.quantity}
+                </strong>
+              </div>
+
+              <div className="admin-order-item-detail">
+                <span>Subtotal</span>
+                <strong>
+                  {formatCurrency(item.subtotal)}
+                </strong>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="admin-panel admin-shipping-panel">
+        <div className="admin-panel-header">
+          <div>
+            <h3>Shipping Address</h3>
+
+            <p>
+              Delivery information for this order.
+            </p>
+          </div>
+        </div>
+
+        <div className="admin-shipping-address">
+          <strong>
+            {order.shippingFullName}
+          </strong>
+
+          <span>
+            {order.shippingPhone}
+          </span>
+
+          <span>
+            {order.shippingAddressLine}
+          </span>
+
+          <span>
+            {order.shippingCity},{' '}
+            {order.shippingState}
+          </span>
+
+          <span>
+            {order.shippingPostalCode},{' '}
+            {order.shippingCountry}
+          </span>
+        </div>
+      </section>
+
+      <Link
+        to="/admin/orders"
+        className="admin-back-link"
+      >
+        ← Back to Orders
       </Link>
     </div>
   )

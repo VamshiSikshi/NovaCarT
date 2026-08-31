@@ -16,7 +16,8 @@ function AdminCategoriesPage() {
   const [success, setSuccess] = useState('')
 
   const [showForm, setShowForm] = useState(false)
-  const [editingCategoryId, setEditingCategoryId] = useState(null)
+  const [editingCategoryId, setEditingCategoryId] =
+    useState(null)
 
   const [form, setForm] = useState(emptyForm)
 
@@ -55,7 +56,7 @@ function AdminCategoriesPage() {
 
   const openCreateForm = () => {
     setEditingCategoryId(null)
-    setForm(emptyForm)
+    setForm({ ...emptyForm })
     setError('')
     setSuccess('')
     setShowForm(true)
@@ -77,7 +78,7 @@ function AdminCategoriesPage() {
   const closeForm = () => {
     setShowForm(false)
     setEditingCategoryId(null)
-    setForm(emptyForm)
+    setForm({ ...emptyForm })
   }
 
   const saveCategory = async (event) => {
@@ -151,116 +152,295 @@ function AdminCategoriesPage() {
   }
 
   if (loading) {
-    return <p>Loading categories...</p>
+    return (
+      <div className="admin-page-state">
+        <div className="admin-spinner"></div>
+        <p>Loading categories...</p>
+      </div>
+    )
   }
 
   return (
-    <div>
-      <h1>Admin Categories</h1>
+    <div className="admin-page">
 
-      {error && <p>{error}</p>}
+      {/* =========================
+          PAGE HEADER
+          ========================= */}
 
-      {success && <p>{success}</p>}
+      <div className="admin-page-header">
 
-      <button
-        type="button"
-        onClick={openCreateForm}
-      >
-        Add Category
-      </button>
+        <div>
+          <p className="admin-eyebrow">
+            Catalog management
+          </p>
 
-      {showForm && (
-        <section>
-          <h2>
-            {editingCategoryId
-              ? 'Edit Category'
-              : 'Create Category'}
-          </h2>
+          <h1>Categories</h1>
 
-          <form onSubmit={saveCategory}>
-            <div>
-              <label>Category Name</label>
+          <p className="admin-page-description">
+            Manage your product categories.
+          </p>
+        </div>
 
-              <input
-                name="name"
-                value={form.name}
-                onChange={handleChange}
-                maxLength={50}
-                required
-              />
+        <button
+          type="button"
+          className="admin-primary-button"
+          onClick={openCreateForm}
+        >
+          + Add Category
+        </button>
+
+      </div>
+
+
+      {/* =========================
+          ALERTS
+          ========================= */}
+
+      {error && (
+        <div className="admin-alert admin-alert-error">
+          <span>!</span>
+          {error}
+        </div>
+      )}
+
+      {success && (
+        <div className="admin-alert admin-alert-success">
+          <span>✓</span>
+          {success}
+        </div>
+      )}
+
+
+      {/* =========================
+          CATEGORY TABLE
+          ========================= */}
+
+      <section className="admin-table-card">
+
+        <div className="admin-table-header">
+          <div>
+            <h2>Category Catalog</h2>
+
+            <span>
+              {categories.length}{' '}
+              {categories.length === 1
+                ? 'category'
+                : 'categories'}
+            </span>
+          </div>
+        </div>
+
+        {categories.length === 0 ? (
+          <div className="admin-empty-state">
+
+            <div className="admin-empty-icon">
+              C
             </div>
 
-            <div>
-              <label>Description</label>
+            <h3>No categories found</h3>
 
-              <textarea
-                name="description"
-                value={form.description}
-                onChange={handleChange}
-                maxLength={500}
-              />
-            </div>
-
-            <button
-              type="submit"
-              disabled={saving}
-            >
-              {saving
-                ? 'Saving...'
-                : editingCategoryId
-                  ? 'Update Category'
-                  : 'Create Category'}
-            </button>
+            <p>
+              Create your first category to organize
+              your products.
+            </p>
 
             <button
               type="button"
-              onClick={closeForm}
+              className="admin-primary-button"
+              onClick={openCreateForm}
             >
-              Cancel
+              + Add Category
             </button>
-          </form>
-        </section>
+
+          </div>
+        ) : (
+          <div className="admin-table-wrapper">
+
+            <table className="admin-table">
+
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Category</th>
+                  <th>Description</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+
+              <tbody>
+
+                {categories.map((category) => (
+                  <tr key={category.id}>
+
+                    <td>
+                      #{category.id}
+                    </td>
+
+                    <td>
+                      <strong>
+                        {category.name}
+                      </strong>
+                    </td>
+
+                    <td>
+                      {category.description ||
+                        'No description'}
+                    </td>
+
+                    <td>
+
+                      <div className="admin-actions">
+
+                        <button
+                          type="button"
+                          className="admin-action-button edit"
+                          onClick={() =>
+                            openEditForm(category)
+                          }
+                        >
+                          Edit
+                        </button>
+
+                        <button
+                          type="button"
+                          className="admin-action-button delete"
+                          onClick={() =>
+                            deleteCategory(
+                              category.id
+                            )
+                          }
+                        >
+                          Delete
+                        </button>
+
+                      </div>
+
+                    </td>
+
+                  </tr>
+                ))}
+
+              </tbody>
+
+            </table>
+
+          </div>
+        )}
+
+      </section>
+
+
+      {/* =========================
+          CREATE / EDIT MODAL
+          ========================= */}
+
+      {showForm && (
+        <div className="admin-modal-overlay">
+
+          <div className="admin-modal">
+
+            <div className="admin-modal-header">
+
+              <div>
+                <p className="admin-eyebrow">
+                  Catalog management
+                </p>
+
+                <h2>
+                  {editingCategoryId
+                    ? 'Edit Category'
+                    : 'Create Category'}
+                </h2>
+              </div>
+
+              <button
+                type="button"
+                className="admin-modal-close"
+                onClick={closeForm}
+                aria-label="Close"
+              >
+                ×
+              </button>
+
+            </div>
+
+
+            <form
+              className="admin-product-form"
+              onSubmit={saveCategory}
+            >
+
+              <div className="admin-form-group">
+
+                <label htmlFor="category-name">
+                  Category Name
+                </label>
+
+                <input
+                  id="category-name"
+                  name="name"
+                  value={form.name}
+                  onChange={handleChange}
+                  maxLength={50}
+                  required
+                  autoFocus
+                  placeholder="Enter category name"
+                />
+
+              </div>
+
+
+              <div className="admin-form-group">
+
+                <label htmlFor="category-description">
+                  Description
+                </label>
+
+                <textarea
+                  id="category-description"
+                  name="description"
+                  value={form.description}
+                  onChange={handleChange}
+                  maxLength={500}
+                  rows={5}
+                  placeholder="Enter category description"
+                />
+
+              </div>
+
+
+              <div className="admin-modal-actions">
+
+                <button
+                  type="button"
+                  className="admin-secondary-button"
+                  onClick={closeForm}
+                  disabled={saving}
+                >
+                  Cancel
+                </button>
+
+                <button
+                  type="submit"
+                  className="admin-primary-button"
+                  disabled={saving}
+                >
+                  {saving
+                    ? 'Saving...'
+                    : editingCategoryId
+                      ? 'Update Category'
+                      : 'Create Category'}
+                </button>
+
+              </div>
+
+            </form>
+
+          </div>
+
+        </div>
       )}
 
-      <section>
-        <h2>Categories</h2>
-
-        {categories.length === 0 ? (
-          <p>No categories found.</p>
-        ) : (
-          categories.map((category) => (
-            <article key={category.id}>
-              <h3>
-                #{category.id} - {category.name}
-              </h3>
-
-              <p>
-                Description:{' '}
-                {category.description ||
-                  'No description'}
-              </p>
-
-              <button
-                type="button"
-                onClick={() =>
-                  openEditForm(category)
-                }
-              >
-                Edit
-              </button>
-
-              <button
-                type="button"
-                onClick={() =>
-                  deleteCategory(category.id)
-                }
-              >
-                Delete
-              </button>
-            </article>
-          ))
-        )}
-      </section>
     </div>
   )
 }
