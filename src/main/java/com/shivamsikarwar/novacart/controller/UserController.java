@@ -4,10 +4,7 @@ import com.shivamsikarwar.novacart.dto.UserRequestDto;
 import com.shivamsikarwar.novacart.dto.UserResponseDto;
 import com.shivamsikarwar.novacart.service.UserService;
 import jakarta.validation.Valid;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/users")
@@ -22,5 +19,10 @@ public class UserController {
     @PostMapping
     public UserResponseDto createUser(@Valid @RequestBody UserRequestDto request){
         return userService.createUser(request);
+    }
+
+    @GetMapping("/me")
+    public UserResponseDto getCurrentUser() {
+        return userService.getCurrentUser();
     }
 }
