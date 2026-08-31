@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -17,6 +16,10 @@ public class ProductRequestDto {
 
     @Size(max=500, message="Description cannot exceed 500 characters")
     private String description;
+
+    @NotNull(message="Original price is required")
+    @DecimalMin(value="0.01", message="Original price must be greater than 0")
+    private BigDecimal originalPrice;
 
     @NotNull(message="Price is required")
     @DecimalMin(value="0.01", message="Price must be greater than 0")
