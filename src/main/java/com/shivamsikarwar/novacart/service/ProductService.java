@@ -41,6 +41,12 @@ public class ProductService {
     public ProductResponseDto createProduct(
             ProductRequestDto request) {
 
+        if (request.getPrice().compareTo(request.getOriginalPrice()) > 0) {
+            throw new IllegalArgumentException(
+                    "Selling price cannot be greater than original price"
+            );
+        }
+
         Category category =
                 findCategoryById(request.getCategoryId());
 
@@ -83,6 +89,13 @@ public class ProductService {
             Long id,
             ProductRequestDto request) {
 
+        if (request.getPrice().compareTo(request.getOriginalPrice()) > 0) {
+            throw new IllegalArgumentException(
+                    "Selling price cannot be greater than original price"
+            );
+        }
+
+
         Product product =
                 findProductById(id);
 
@@ -91,6 +104,7 @@ public class ProductService {
 
         product.setName(request.getName());
         product.setDescription(request.getDescription());
+        product.setOriginalPrice(request.getOriginalPrice());
         product.setPrice(request.getPrice());
         product.setStock(request.getStock());
         product.setImageUrl(request.getImageUrl());
@@ -382,6 +396,7 @@ public class ProductService {
         response.setId(product.getId());
         response.setName(product.getName());
         response.setDescription(product.getDescription());
+        response.setOriginalPrice(product.getOriginalPrice());
         response.setPrice(product.getPrice());
         response.setStock(product.getStock());
         response.setImageUrl(product.getImageUrl());
@@ -405,6 +420,7 @@ public class ProductService {
 
         product.setName(request.getName());
         product.setDescription(request.getDescription());
+        product.setOriginalPrice(request.getOriginalPrice());
         product.setPrice(request.getPrice());
         product.setStock(request.getStock());
         product.setImageUrl(request.getImageUrl());
