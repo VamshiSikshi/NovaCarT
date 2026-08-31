@@ -2,6 +2,35 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import api from '../../../api/axios'
 
+const formatCurrency = (amount) =>
+  `₹${Number(amount || 0).toLocaleString('en-IN')}`
+
+const formatDate = (date) => {
+  if (!date) return '—'
+
+  return new Date(date).toLocaleString('en-IN', {
+    dateStyle: 'medium',
+    timeStyle: 'short',
+  })
+}
+
+const getStatusClass = (status) => {
+  switch (status) {
+    case 'PENDING':
+      return 'status-pending'
+    case 'CONFIRMED':
+      return 'status-confirmed'
+    case 'SHIPPED':
+      return 'status-shipped'
+    case 'DELIVERED':
+      return 'status-delivered'
+    case 'CANCELLED':
+      return 'status-cancelled'
+    default:
+      return ''
+  }
+}
+
 function AdminOrdersPage() {
   const [orders, setOrders] = useState([])
   const [status, setStatus] = useState('')
@@ -35,68 +64,155 @@ function AdminOrdersPage() {
   }, [status])
 
   if (loading) {
-    return <p>Loading admin orders...</p>
+    return (
+      <div className="admin-state">
+        <p>Loading admin orders...</p>
+      </div>
+    )
   }
 
   if (error) {
-    return <p>{error}</p>
+    return (
+      <div className="admin-state admin-state-error">
+        <p>{error}</p>
+      </div>
+    )
   }
 
   return (
-    <div>
-      <h1>Admin Orders</h1>
+    <div className="admin-orders-page">
+      <div className="admin-page-heading">
+        <p className="admin-page-eyebrow">
+          ORDER MANAGEMENT
+        </p>
 
-      <div>
-        <label>Status: </label>
+        <h2>Orders</h2>
 
-        <select
-          value={status}
-          onChange={(event) => setStatus(event.target.value)}
-        >
-          <option value="">ALL</option>
-          <option value="PENDING">PENDING</option>
-          <option value="CONFIRMED">CONFIRMED</option>
-          <option value="SHIPPED">SHIPPED</option>
-          <option value="DELIVERED">DELIVERED</option>
-          <option value="CANCELLED">CANCELLED</option>
-        </select>
+        <p className="admin-page-description">
+          Monitor customer orders and manage their status.
+        </p>
       </div>
 
-      {orders.length === 0 ? (
-        <p>No orders found.</p>
-      ) : (
+      <section className="admin-panel admin-orders-toolbar">
         <div>
-          {orders.map((order) => (
-            <div key={order.orderId}>
-              <h2>Order #{order.orderId}</h2>
+          <span className="admin-toolbar-label">
+            Filter orders
+          </span>
 
-              <p>
-                Customer: {order.username}
-              </p>
-
-              <p>
-                User ID: {order.userId}
-              </p>
-
-              <p>
-                Status: {order.status}
-              </p>
-
-              <p>
-                Total: ₹{order.totalAmount}
-              </p>
-
-              <p>
-                Created At: {order.createdAt}
-              </p>
-
-              <Link to={`/admin/orders/${order.orderId}`}>
-                View Order
-              </Link>
-            </div>
-          ))}
+          <p>
+            View orders by their current status.
+          </p>
         </div>
-      )}
+
+        <div className="admin-filter-control">
+          <label htmlFor="order-status">
+            Status
+          </label>
+
+          <select
+            id="order-status"
+            value={status}
+            onChange={(event) =>
+              setStatus(event.target.value)
+            }
+          >
+            <option value="">ALL</option>
+            <option value="PENDING">PENDING</option>
+            <option value="CONFIRMED">CONFIRMED</option>
+            <option value="SHIPPED">SHIPPED</option>
+            <option value="DELIVERED">DELIVERED</option>
+            <option value="CANCELLED">CANCELLED</option>
+          </select>
+        </div>
+      </section>
+
+      <section className="admin-panel admin-orders-list">
+        <div className="admin-panel-header">
+          <div>
+            <h3>Order List</h3>
+
+            <p>
+              {orders.length}{' '}
+              {orders.length === 1
+                ? 'order'
+                : 'orders'}{' '}
+              found
+            </p>
+          </div>
+        </div>
+
+        {orders.length === 0 ? (
+          <div className="admin-empty-state">
+            <strong>No orders found</strong>
+
+            <p>
+              There are no orders matching the selected
+              status.
+            </p>
+          </div>
+        ) : (
+          <div className="admin-order-table">
+            <div className="admin-order-table-header">
+              <span>Order</span>
+              <span>Customer</span>
+              <span>Status</span>
+              <span>Total</span>
+              <span>Created</span>
+              <span></span>
+            </div>
+
+            {orders.map((order) => (
+              <div
+                className="admin-order-row"
+                key={order.orderId}
+              >
+                <div className="admin-order-id">
+                  <strong>
+                    #{order.orderId}
+                  </strong>
+                </div>
+
+                <div className="admin-order-customer">
+                  <strong>
+                    {order.username}
+                  </strong>
+
+                  <span>
+                    User ID: {order.userId}
+                  </span>
+                </div>
+
+                <div>
+                  <span
+                    className={`admin-status-badge ${getStatusClass(
+                      order.status
+                    )}`}
+                  >
+                    {order.status}
+                  </span>
+                </div>
+
+                <div className="admin-order-total">
+                  {formatCurrency(order.totalAmount)}
+                </div>
+
+                <div className="admin-order-date">
+                  {formatDate(order.createdAt)}
+                </div>
+
+                <div className="admin-order-action">
+                  <Link
+                    to={`/admin/orders/${order.orderId}`}
+                    className="admin-action-button"
+                  >
+                    View
+                  </Link>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
     </div>
   )
 }

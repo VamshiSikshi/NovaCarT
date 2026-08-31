@@ -18,24 +18,9 @@ function Navbar() {
       )}
 
       {isAuthenticated && user?.role === 'ADMIN' && (
-        <>
-          <Link to="/admin">Admin</Link>
-          <Link to="/admin/products">
-            Admin Products
-          </Link>
-          <Link to="/admin/categories">
-            Admin Categories
-          </Link>
-          <Link to="/admin/users">
-            Admin Users
-          </Link>
-          <Link to="/admin/orders">
-            Admin Orders
-          </Link>
-          <Link to="/admin/payments">
-            Admin Payments
-          </Link>
-        </>
+        <Link to="/admin">
+          Admin Panel
+        </Link>
       )}
 
       {!isAuthenticated ? (
@@ -49,7 +34,10 @@ function Navbar() {
             Hi, {user?.username}
           </span>
 
-          <button type="button" onClick={logout}>
+          <button
+            type="button"
+            onClick={logout}
+          >
             Logout
           </button>
         </>
