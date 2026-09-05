@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import api from '../../../api/axios'
+import '../../../styles/admin/admin-ordersDetails.css'
 
 const formatCurrency = (amount) =>
   `₹${Number(amount || 0).toLocaleString('en-IN')}`
@@ -56,7 +57,7 @@ function AdminOrderDetailsPage() {
     } catch (error) {
       setError(
         error.response?.data?.message ||
-        'Failed to load order.'
+          'Failed to load order.'
       )
     } finally {
       setLoading(false)
@@ -74,9 +75,7 @@ function AdminOrderDetailsPage() {
     }
 
     if (selectedStatus === order.status) {
-      setError(
-        'Please select a different status.'
-      )
+      setError('Please select a different status.')
       return
     }
 
@@ -95,13 +94,11 @@ function AdminOrderDetailsPage() {
       setOrder(response.data)
       setSelectedStatus(response.data.status)
 
-      setSuccess(
-        'Order status updated successfully.'
-      )
+      setSuccess('Order status updated successfully.')
     } catch (error) {
       setError(
         error.response?.data?.message ||
-        'Failed to update order status.'
+          'Failed to update order status.'
       )
     } finally {
       setUpdating(false)
@@ -111,6 +108,7 @@ function AdminOrderDetailsPage() {
   if (loading) {
     return (
       <div className="admin-state">
+        <div className="admin-loading-spinner" />
         <p>Loading order...</p>
       </div>
     )
@@ -119,6 +117,7 @@ function AdminOrderDetailsPage() {
   if (error && !order) {
     return (
       <div className="admin-state admin-state-error">
+        <strong>Unable to load order</strong>
         <p>{error}</p>
       </div>
     )
@@ -127,258 +126,441 @@ function AdminOrderDetailsPage() {
   if (!order) {
     return (
       <div className="admin-state">
-        <p>Order not found.</p>
+        <strong>Order not found</strong>
+        <p>The requested order could not be found.</p>
       </div>
     )
   }
 
   return (
     <div className="admin-order-details-page">
-      <div className="admin-page-heading">
-        <p className="admin-page-eyebrow">
-          ORDER MANAGEMENT
-        </p>
 
-        <div className="admin-order-details-title">
-          <div>
-            <h2>Order #{order.id}</h2>
-
-            <p className="admin-page-description">
-              Review order information and update its
-              current status.
-            </p>
-          </div>
-
-          <span
-            className={`admin-status-badge admin-status-large ${getStatusClass(
-              order.status
-            )}`}
+      {/* Header */}
+      <header className="admin-order-details-header">
+        <div className="admin-order-header-main">
+          <Link
+            to="/admin/orders"
+            className="admin-order-back"
           >
-            {order.status}
-          </span>
-        </div>
-      </div>
+            ← Orders
+          </Link>
 
+          <div className="admin-order-title-row">
+            <div>
+              <p className="admin-page-eyebrow">
+                ORDER MANAGEMENT
+              </p>
+
+              <h1>
+                Order <span>#{order.id}</span>
+              </h1>
+
+              <p className="admin-order-subtitle">
+                Review order details, customer information,
+                products and fulfillment status.
+              </p>
+            </div>
+
+            <span
+              className={`admin-status-badge admin-status-large ${getStatusClass(
+                order.status
+              )}`}
+            >
+              <span className="admin-status-dot" />
+              {order.status}
+            </span>
+          </div>
+        </div>
+      </header>
+
+      {/* Alerts */}
       {error && (
-        <div className="admin-alert admin-alert-error">
-          {error}
+        <div className="admin-order-alert admin-order-alert-error">
+          <span>!</span>
+          <p>{error}</p>
+          <button
+            type="button"
+            onClick={() => setError('')}
+          >
+            ×
+          </button>
         </div>
       )}
 
       {success && (
-        <div className="admin-alert admin-alert-success">
-          {success}
+        <div className="admin-order-alert admin-order-alert-success">
+          <span>✓</span>
+          <p>{success}</p>
+          <button
+            type="button"
+            onClick={() => setSuccess('')}
+          >
+            ×
+          </button>
         </div>
       )}
 
-      <section className="admin-order-summary-grid">
-        <div className="admin-panel admin-order-summary-card">
-          <span className="admin-summary-label">
-            Customer
-          </span>
+      {/* Summary */}
+      <section className="admin-order-overview">
 
-          <strong>
-            User #{order.userId}
-          </strong>
+        <div className="admin-order-overview-card">
+          <div className="admin-overview-icon customer">
+            C
+          </div>
 
-          <p>
-            Customer account
-          </p>
+          <div>
+            <span>Customer</span>
+            <strong>
+              User #{order.userId}
+            </strong>
+            <small>Customer account</small>
+          </div>
         </div>
 
-        <div className="admin-panel admin-order-summary-card">
-          <span className="admin-summary-label">
-            Order Total
-          </span>
+        <div className="admin-order-overview-card">
+          <div className="admin-overview-icon amount">
+            ₹
+          </div>
 
-          <strong>
-            {formatCurrency(order.totalAmount)}
-          </strong>
-
-          <p>
-            {order.items?.length || 0}{' '}
-            {order.items?.length === 1
-              ? 'item'
-              : 'items'}
-          </p>
+          <div>
+            <span>Order total</span>
+            <strong>
+              {formatCurrency(order.totalAmount)}
+            </strong>
+            <small>
+              {order.items?.length || 0}{' '}
+              {order.items?.length === 1
+                ? 'product'
+                : 'products'}
+            </small>
+          </div>
         </div>
 
-        <div className="admin-panel admin-order-summary-card">
-          <span className="admin-summary-label">
-            Created
-          </span>
+        <div className="admin-order-overview-card">
+          <div className="admin-overview-icon date">
+            #
+          </div>
 
-          <strong>
-            {formatDate(order.createdAt)}
-          </strong>
-
-          <p>
-            Order #{order.id}
-          </p>
+          <div>
+            <span>Order date</span>
+            <strong>
+              {formatDate(order.createdAt)}
+            </strong>
+            <small>
+              Order #{order.id}
+            </small>
+          </div>
         </div>
+
       </section>
 
-      <section className="admin-panel admin-status-panel">
-        <div className="admin-panel-header">
-          <div>
-            <h3>Update Order Status</h3>
+      {/* Main grid */}
+      <div className="admin-order-content-grid">
 
-            <p>
-              Change the order's current fulfillment
-              status.
-            </p>
-          </div>
-        </div>
+        {/* Left column */}
+        <main className="admin-order-main-column">
 
-        <div className="admin-status-form">
-          <div>
-            <label htmlFor="selected-status">
-              Status
-            </label>
+          {/* Products */}
+          <section className="admin-order-section">
+            <div className="admin-section-heading">
+              <div>
+                <p className="admin-section-eyebrow">
+                  PURCHASE
+                </p>
 
-            <select
-              id="selected-status"
-              value={selectedStatus}
-              onChange={(event) =>
-                setSelectedStatus(event.target.value)
-              }
-              disabled={updating}
-            >
-              <option value="PENDING">
-                PENDING
-              </option>
+                <h2>Order items</h2>
 
-              <option value="CONFIRMED">
-                CONFIRMED
-              </option>
+                <p>
+                  Products included in this order.
+                </p>
+              </div>
 
-              <option value="SHIPPED">
-                SHIPPED
-              </option>
+              <span className="admin-section-count">
+                {order.items?.length || 0}
+              </span>
+            </div>
 
-              <option value="DELIVERED">
-                DELIVERED
-              </option>
+            <div className="admin-order-items">
 
-              <option value="CANCELLED">
-                CANCELLED
-              </option>
-            </select>
-          </div>
+              {order.items.map((item, index) => (
+                <article
+                  className="admin-order-item"
+                  key={item.id}
+                >
+                  <div className="admin-item-number">
+                    {String(index + 1).padStart(2, '0')}
+                  </div>
 
-          <button
-            type="button"
-            className="admin-primary-button"
-            onClick={updateOrderStatus}
-            disabled={
-              updating ||
-              selectedStatus === order.status
-            }
-          >
-            {updating
-              ? 'Updating...'
-              : 'Update Status'}
-          </button>
-        </div>
-      </section>
+                  <div className="admin-item-info">
+                    <strong>
+                      {item.productName}
+                    </strong>
 
-      <section className="admin-panel admin-items-panel">
-        <div className="admin-panel-header">
-          <div>
-            <h3>Order Items</h3>
+                    <span>
+                      Product ID #{item.productId}
+                    </span>
+                  </div>
 
-            <p>
-              Products included in this order.
-            </p>
-          </div>
+                  <div className="admin-item-meta">
+                    <span>Unit price</span>
+                    <strong>
+                      {formatCurrency(item.price)}
+                    </strong>
+                  </div>
 
-          <span className="admin-panel-total">
-            {order.items?.length || 0} items
-          </span>
-        </div>
+                  <div className="admin-item-meta">
+                    <span>Quantity</span>
+                    <strong>
+                      × {item.quantity}
+                    </strong>
+                  </div>
 
-        <div className="admin-order-items">
-          {order.items.map((item) => (
-            <div
-              className="admin-order-item"
-              key={item.id}
-            >
-              <div className="admin-order-item-main">
+                  <div className="admin-item-subtotal">
+                    <span>Subtotal</span>
+                    <strong>
+                      {formatCurrency(item.subtotal)}
+                    </strong>
+                  </div>
+                </article>
+              ))}
+
+            </div>
+
+            <div className="admin-order-total-row">
+              <span>Order total</span>
+
+              <strong>
+                {formatCurrency(order.totalAmount)}
+              </strong>
+            </div>
+          </section>
+
+          {/* Shipping */}
+          <section className="admin-order-section">
+            <div className="admin-section-heading">
+              <div>
+                <p className="admin-section-eyebrow">
+                  DELIVERY
+                </p>
+
+                <h2>Shipping address</h2>
+
+                <p>
+                  Delivery information provided by the customer.
+                </p>
+              </div>
+            </div>
+
+            <div className="admin-shipping-card">
+              <div className="admin-shipping-avatar">
+                {order.shippingFullName
+                  ?.charAt(0)
+                  ?.toUpperCase() || 'U'}
+              </div>
+
+              <div className="admin-shipping-content">
                 <strong>
-                  {item.productName}
+                  {order.shippingFullName}
                 </strong>
 
                 <span>
-                  Product ID: {item.productId}
+                  {order.shippingPhone}
                 </span>
+
+                <address>
+                  {order.shippingAddressLine}
+                  <br />
+                  {order.shippingCity},{' '}
+                  {order.shippingState}
+                  <br />
+                  {order.shippingPostalCode},{' '}
+                  {order.shippingCountry}
+                </address>
+              </div>
+            </div>
+          </section>
+
+        </main>
+
+        {/* Right column */}
+        <aside className="admin-order-side-column">
+
+          {/* Status */}
+          <section className="admin-order-section admin-status-section">
+            <div className="admin-section-heading">
+              <div>
+                <p className="admin-section-eyebrow">
+                  FULFILLMENT
+                </p>
+
+                <h2>Order status</h2>
+
+                <p>
+                  Update the current fulfillment state.
+                </p>
+              </div>
+            </div>
+
+            <div className="admin-current-status">
+              <span
+                className={`admin-status-badge ${getStatusClass(
+                  order.status
+                )}`}
+              >
+                <span className="admin-status-dot" />
+                {order.status}
+              </span>
+            </div>
+
+            <div className="admin-status-update">
+              <label htmlFor="selected-status">
+                Change status
+              </label>
+
+              <select
+                id="selected-status"
+                value={selectedStatus}
+                onChange={(event) =>
+                  setSelectedStatus(event.target.value)
+                }
+                disabled={updating}
+              >
+                <option value="PENDING">
+                  PENDING
+                </option>
+
+                <option value="CONFIRMED">
+                  CONFIRMED
+                </option>
+
+                <option value="SHIPPED">
+                  SHIPPED
+                </option>
+
+                <option value="DELIVERED">
+                  DELIVERED
+                </option>
+
+                <option value="CANCELLED">
+                  CANCELLED
+                </option>
+              </select>
+
+              <button
+                type="button"
+                className="admin-order-update-button"
+                onClick={updateOrderStatus}
+                disabled={
+                  updating ||
+                  selectedStatus === order.status
+                }
+              >
+                {updating
+                  ? 'Updating...'
+                  : 'Update status'}
+
+                {!updating && <span>→</span>}
+              </button>
+            </div>
+
+            <div className="admin-status-flow">
+              <div
+                className={
+                  order.status === 'CANCELLED'
+                    ? 'cancelled'
+                    : 'completed'
+                }
+              >
+                <span />
+                <label>Pending</label>
               </div>
 
-              <div className="admin-order-item-detail">
-                <span>Price</span>
+              <div
+                className={
+                  ['CONFIRMED', 'SHIPPED', 'DELIVERED'].includes(
+                    order.status
+                  )
+                    ? 'completed'
+                    : ''
+                }
+              >
+                <span />
+                <label>Confirmed</label>
+              </div>
+
+              <div
+                className={
+                  ['SHIPPED', 'DELIVERED'].includes(
+                    order.status
+                  )
+                    ? 'completed'
+                    : ''
+                }
+              >
+                <span />
+                <label>Shipped</label>
+              </div>
+
+              <div
+                className={
+                  order.status === 'DELIVERED'
+                    ? 'completed'
+                    : ''
+                }
+              >
+                <span />
+                <label>Delivered</label>
+              </div>
+            </div>
+          </section>
+
+          {/* Order information */}
+          <section className="admin-order-section admin-order-info-section">
+            <div className="admin-section-heading">
+              <div>
+                <p className="admin-section-eyebrow">
+                  INFORMATION
+                </p>
+
+                <h2>Order information</h2>
+              </div>
+            </div>
+
+            <div className="admin-info-list">
+              <div>
+                <span>Order ID</span>
+                <strong>#{order.id}</strong>
+              </div>
+
+              <div>
+                <span>Customer ID</span>
+                <strong>#{order.userId}</strong>
+              </div>
+
+              <div>
+                <span>Products</span>
                 <strong>
-                  {formatCurrency(item.price)}
+                  {order.items?.length || 0}
                 </strong>
               </div>
 
-              <div className="admin-order-item-detail">
-                <span>Quantity</span>
+              <div>
+                <span>Created</span>
                 <strong>
-                  {item.quantity}
-                </strong>
-              </div>
-
-              <div className="admin-order-item-detail">
-                <span>Subtotal</span>
-                <strong>
-                  {formatCurrency(item.subtotal)}
+                  {formatDate(order.createdAt)}
                 </strong>
               </div>
             </div>
-          ))}
-        </div>
-      </section>
+          </section>
 
-      <section className="admin-panel admin-shipping-panel">
-        <div className="admin-panel-header">
-          <div>
-            <h3>Shipping Address</h3>
-
-            <p>
-              Delivery information for this order.
-            </p>
-          </div>
-        </div>
-
-        <div className="admin-shipping-address">
-          <strong>
-            {order.shippingFullName}
-          </strong>
-
-          <span>
-            {order.shippingPhone}
-          </span>
-
-          <span>
-            {order.shippingAddressLine}
-          </span>
-
-          <span>
-            {order.shippingCity},{' '}
-            {order.shippingState}
-          </span>
-
-          <span>
-            {order.shippingPostalCode},{' '}
-            {order.shippingCountry}
-          </span>
-        </div>
-      </section>
+        </aside>
+      </div>
 
       <Link
         to="/admin/orders"
-        className="admin-back-link"
+        className="admin-order-bottom-link"
       >
-        ← Back to Orders
+        ← Back to all orders
       </Link>
     </div>
   )

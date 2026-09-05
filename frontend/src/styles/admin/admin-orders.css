@@ -1,0 +1,642 @@
+
+/* =========================================================
+   NOVACART — ADMIN ORDERS
+   Production-level order management UI
+   ========================================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+
+/* =========================================================
+   PAGE
+   ========================================================= */
+
+.admin-orders-page {
+  width: min(1440px, 100%);
+  margin: 0 auto;
+  padding: 44px 44px 72px;
+
+  color: #15121a;
+
+  font-family:
+    'Plus Jakarta Sans',
+    Inter,
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    sans-serif;
+}
+
+
+/* =========================================================
+   PAGE HEADING
+   ========================================================= */
+
+.admin-orders-page .admin-page-heading {
+  margin-bottom: 34px;
+}
+
+.admin-orders-page .admin-page-eyebrow {
+  margin: 0 0 13px;
+
+  color: #7c3aed;
+
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  line-height: 1.3;
+
+  text-transform: uppercase;
+}
+
+.admin-orders-page .admin-page-heading h2 {
+  margin: 0;
+
+  color: #100c15;
+
+  font-size: clamp(42px, 4vw, 58px);
+  font-weight: 800;
+  letter-spacing: -2.8px;
+  line-height: 1.02;
+}
+
+.admin-orders-page .admin-page-description {
+  max-width: 680px;
+
+  margin: 15px 0 0;
+
+  color: #777080;
+
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.7;
+}
+
+
+/* =========================================================
+   COMMON PANEL
+   ========================================================= */
+
+.admin-orders-page .admin-panel {
+  background: #ffffff;
+
+  border: 1px solid #e9e4ee;
+  border-radius: 18px;
+
+  box-shadow:
+    0 10px 30px rgba(30, 20, 45, 0.035);
+}
+
+
+/* =========================================================
+   FILTER TOOLBAR
+   ========================================================= */
+
+.admin-orders-page .admin-orders-toolbar {
+  min-height: 96px;
+
+  margin-bottom: 26px;
+  padding: 20px 24px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 28px;
+}
+
+.admin-orders-page .admin-toolbar-label {
+  display: block;
+
+  margin-bottom: 6px;
+
+  color: #211b27;
+
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: -0.2px;
+}
+
+.admin-orders-page .admin-orders-toolbar p {
+  margin: 0;
+
+  color: #8c8493;
+
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+
+/* =========================================================
+   FILTER
+   ========================================================= */
+
+.admin-orders-page .admin-filter-control {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.admin-orders-page .admin-filter-control label {
+  color: #696170;
+
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.admin-orders-page .admin-filter-control select {
+  min-width: 180px;
+  height: 46px;
+
+  padding: 0 38px 0 14px;
+
+  border: 1px solid #ddd7e4;
+  border-radius: 10px;
+
+  outline: none;
+
+  background: #ffffff;
+  color: #211b27;
+
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    background 160ms ease;
+}
+
+.admin-orders-page .admin-filter-control select:hover {
+  border-color: #c8b7f3;
+  background: #fcfaff;
+}
+
+.admin-orders-page .admin-filter-control select:focus {
+  border-color: #8b5cf6;
+
+  box-shadow:
+    0 0 0 3px rgba(139, 92, 246, 0.12);
+}
+
+
+/* =========================================================
+   ORDER LIST PANEL
+   ========================================================= */
+
+.admin-orders-page .admin-orders-list {
+  overflow: hidden;
+}
+
+.admin-orders-page .admin-panel-header {
+  min-height: 92px;
+
+  padding: 22px 26px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  border-bottom: 1px solid #eeeaf1;
+}
+
+.admin-orders-page .admin-panel-header h3 {
+  margin: 0 0 6px;
+
+  color: #19141f;
+
+  font-size: 19px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+
+.admin-orders-page .admin-panel-header p {
+  margin: 0;
+
+  color: #948b9b;
+
+  font-size: 12px;
+  font-weight: 500;
+}
+
+
+/* =========================================================
+   TABLE
+   ========================================================= */
+
+.admin-orders-page .admin-order-table {
+  width: 100%;
+  overflow:hidden;
+}
+
+
+/* =========================================================
+   TABLE HEADER
+   ========================================================= */
+
+.admin-orders-page .admin-order-table-header,
+.admin-orders-page .admin-order-row {
+  width: 100%;
+
+  display: grid;
+
+  grid-template-columns:
+    100px
+    minmax(150px, 1.5fr)
+    140px
+    130px
+    minmax(170px, 1.2fr)
+    80px;
+
+  align-items: center;
+}
+
+.admin-orders-page .admin-order-table-header {
+  min-height: 54px;
+
+  padding: 0 24px;
+
+  background: #fbfafd;
+
+  border-bottom: 1px solid #eeeaf1;
+}
+
+.admin-orders-page .admin-order-table-header span {
+  color: #8b8293;
+
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1.25px;
+  line-height: 1.2;
+
+  text-transform: uppercase;
+}
+
+
+/* =========================================================
+   TABLE ROW
+   ========================================================= */
+
+.admin-orders-page .admin-order-row {
+  min-height: 92px;
+
+  padding: 0 24px;
+
+  border-bottom: 1px solid #f0edf3;
+
+  transition:
+    background 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.admin-orders-page .admin-order-row:last-child {
+  border-bottom: 0;
+}
+
+.admin-orders-page .admin-order-row:hover {
+  background: #fcfaff;
+
+  box-shadow:
+    inset 3px 0 0 #8b5cf6;
+}
+
+
+/* =========================================================
+   ORDER ID
+   ========================================================= */
+
+.admin-orders-page .admin-order-id strong {
+  display: inline-flex;
+  align-items: center;
+
+  color: #302936;
+
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: -0.2px;
+}
+
+
+/* =========================================================
+   CUSTOMER
+   ========================================================= */
+
+.admin-orders-page .admin-order-customer {
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.admin-orders-page .admin-order-customer strong {
+  overflow: hidden;
+
+  color: #211b27;
+
+  font-size: 14px;
+  font-weight: 750;
+  line-height: 1.35;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-orders-page .admin-order-customer span {
+  color: #938a9a;
+
+  font-size: 11px;
+  font-weight: 500;
+}
+
+
+/* =========================================================
+   STATUS
+   ========================================================= */
+
+.admin-orders-page .admin-status-badge {
+  min-height: 30px;
+
+  padding: 0 11px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid transparent;
+  border-radius: 999px;
+
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.45px;
+
+  line-height: 1;
+
+  white-space: nowrap;
+}
+
+
+/* PENDING */
+
+.admin-orders-page .status-pending {
+  color: #a35b00;
+
+  background: #fff7e8;
+  border-color: #f4dfb9;
+}
+
+
+/* CONFIRMED */
+
+.admin-orders-page .status-confirmed {
+  color: #155fb0;
+
+  background: #edf6ff;
+  border-color: #cfe5fa;
+}
+
+
+/* SHIPPED */
+
+.admin-orders-page .status-shipped {
+  color: #6941b7;
+
+  background: #f4efff;
+  border-color: #ded0fa;
+}
+
+
+/* DELIVERED */
+
+.admin-orders-page .status-delivered {
+  color: #147548;
+
+  background: #edf9f2;
+  border-color: #cdebd9;
+}
+
+
+/* CANCELLED */
+
+.admin-orders-page .status-cancelled {
+  color: #b53838;
+
+  background: #fff0f0;
+  border-color: #f0d0d0;
+}
+
+
+/* =========================================================
+   TOTAL
+   ========================================================= */
+
+.admin-orders-page .admin-order-total {
+  color: #17131b;
+
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: -0.25px;
+}
+
+
+/* =========================================================
+   DATE
+   ========================================================= */
+
+.admin-orders-page .admin-order-date {
+  color: #746b7b;
+
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+
+/* =========================================================
+   VIEW ACTION
+   ========================================================= */
+
+.admin-orders-page .admin-order-action {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.admin-orders-page .admin-action-button {
+  min-width: 72px;
+  height: 38px;
+
+  padding: 0 13px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid #ddd7e5;
+  border-radius: 9px;
+
+  background: #ffffff;
+  color: #3b3343;
+
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 800;
+
+  text-decoration: none;
+
+  transition:
+    transform 160ms ease,
+    color 160ms ease,
+    background 160ms ease,
+    border-color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.admin-orders-page .admin-action-button:hover {
+  transform: translateY(-1px);
+
+  color: #7137dc;
+
+  background: #faf7ff;
+  border-color: #cdbcf3;
+
+  box-shadow:
+    0 6px 15px rgba(113, 55, 220, 0.09);
+}
+
+
+/* =========================================================
+   EMPTY STATE
+   ========================================================= */
+
+.admin-orders-page .admin-empty-state {
+  min-height: 280px;
+
+  padding: 50px 30px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  text-align: center;
+}
+
+.admin-orders-page .admin-empty-state strong {
+  margin-bottom: 9px;
+
+  color: #211b27;
+
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.admin-orders-page .admin-empty-state p {
+  max-width: 430px;
+
+  margin: 0;
+
+  color: #918898;
+
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.6;
+}
+
+
+/* =========================================================
+   LOADING / ERROR
+   ========================================================= */
+
+.admin-orders-page + .admin-state,
+.admin-state {
+  font-family:
+    'Plus Jakarta Sans',
+    Inter,
+    ui-sans-serif,
+    system-ui,
+    sans-serif;
+}
+
+.admin-state {
+  min-height: 300px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: #706878;
+
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.admin-state-error {
+  color: #b43b3b;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 1000px) {
+  .admin-orders-page {
+    padding: 34px 26px 56px;
+  }
+
+  .admin-orders-page .admin-orders-toolbar {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .admin-orders-page .admin-filter-control {
+    width: 100%;
+  }
+
+  .admin-orders-page .admin-filter-control select {
+    flex: 1;
+  }
+}
+
+
+@media (max-width: 640px) {
+  .admin-orders-page {
+    padding: 28px 16px 44px;
+  }
+
+  .admin-orders-page .admin-page-heading {
+    margin-bottom: 24px;
+  }
+
+  .admin-orders-page .admin-page-heading h2 {
+    font-size: 40px;
+    letter-spacing: -2px;
+  }
+
+  .admin-orders-page .admin-page-description {
+    font-size: 14px;
+  }
+
+  .admin-orders-page .admin-orders-toolbar {
+    padding: 18px;
+  }
+
+  .admin-orders-page .admin-filter-control {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .admin-orders-page .admin-filter-control select {
+    width: 100%;
+  }
+
+  .admin-orders-page .admin-panel-header {
+    padding: 19px;
+  }
+}

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import api from '../../../api/axios'
+import '../../../styles/admin/admin-orders.css'
 
 const formatCurrency = (amount) =>
   `₹${Number(amount || 0).toLocaleString('en-IN')}`

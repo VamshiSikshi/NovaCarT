@@ -1,6 +1,33 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import api from '../../../api/axios'
+import '../../../styles/admin/admin-payments.css'
+
+const formatCurrency = (amount) =>
+  `₹${Number(amount || 0).toLocaleString('en-IN')}`
+
+const formatDate = (date) => {
+  if (!date) return '—'
+
+  return new Date(date).toLocaleString('en-IN', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true,
+  })
+}
+
+const formatTransactionId = (transactionId) => {
+  if (!transactionId) return 'N/A'
+
+  if (transactionId.length <= 18) {
+    return transactionId
+  }
+
+  return `${transactionId.slice(0, 10)}...${transactionId.slice(-6)}`
+}
 
 function AdminPaymentsPage() {
   const [payments, setPayments] = useState([])
@@ -227,7 +254,7 @@ function AdminPaymentsPage() {
                 </div>
 
                 <div className="admin-payment-amount">
-                  ₹{Number(payment.amount).toLocaleString('en-IN')}
+                  {formatCurrency(payment.amount)}
                 </div>
 
                 <div>
@@ -248,16 +275,13 @@ function AdminPaymentsPage() {
 
                 <div
                   className="admin-payment-transaction"
-                  title={
-                    payment.transactionId ||
-                    'N/A'
-                  }
+                  title={payment.transactionId || 'N/A'}
                 >
-                  {payment.transactionId || 'N/A'}
+                  {formatTransactionId(payment.transactionId)}
                 </div>
 
                 <div className="admin-payment-date">
-                  {payment.createdAt}
+                  {formatDate(payment.createdAt)}
                 </div>
 
                 <div className="admin-payment-action">

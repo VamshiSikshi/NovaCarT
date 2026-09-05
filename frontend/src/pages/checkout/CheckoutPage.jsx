@@ -1,20 +1,30 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import api from '../../api/axios'
+import '../../styles/checkout.css'
 
 function CheckoutPage() {
   const [cart, setCart] = useState(null)
   const [addresses, setAddresses] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
-  const [showAddressForm, setShowAddressForm] = useState(false)
-  const [selectedAddressId, setSelectedAddressId] = useState(null)
-  const [placingOrder, setPlacingOrder] = useState(false)
-  const [paymentMethod, setPaymentMethod] = useState('COD')
-  const [payment, setPayment] = useState(null)
-  const [processingPayment, setProcessingPayment] = useState(false)
-  const navigate = useNavigate()
 
+  const [showAddressForm, setShowAddressForm] =
+    useState(false)
+  const [selectedAddressId, setSelectedAddressId] =
+    useState(null)
+
+  const [placingOrder, setPlacingOrder] =
+    useState(false)
+
+  const [paymentMethod, setPaymentMethod] =
+    useState('COD')
+
+  const [payment, setPayment] = useState(null)
+  const [processingPayment, setProcessingPayment] =
+    useState(false)
+
+  const navigate = useNavigate()
 
   const [form, setForm] = useState({
     fullName: '',
@@ -38,10 +48,16 @@ function CheckoutPage() {
 
         setCart(cartResponse.data)
         setAddresses(addressResponse.data)
+
+        if (addressResponse.data.length > 0) {
+          setSelectedAddressId(
+            addressResponse.data[0].id
+          )
+        }
       } catch (error) {
         setError(
           error.response?.data?.message ||
-          'Failed to load checkout data.'
+            'Failed to load checkout data.'
         )
       } finally {
         setLoading(false)
@@ -92,14 +108,16 @@ function CheckoutPage() {
     } catch (error) {
       setError(
         error.response?.data?.message ||
-        'Failed to create address.'
+          'Failed to create address.'
       )
     }
   }
 
   const placeOrder = async () => {
     if (!selectedAddressId) {
-      setError('Please select a shipping address.')
+      setError(
+        'Please select a shipping address.'
+      )
       return
     }
 
@@ -107,18 +125,19 @@ function CheckoutPage() {
       setPlacingOrder(true)
       setError('')
 
-      // Step 1: Create order
-      const orderResponse = await api.post('/api/orders', {
-        addressId: selectedAddressId,
-        items: cart.items.map((item) => ({
-          productId: item.productId,
-          quantity: item.quantity,
-        })),
-      })
+      const orderResponse = await api.post(
+        '/api/orders',
+        {
+          addressId: selectedAddressId,
+          items: cart.items.map((item) => ({
+            productId: item.productId,
+            quantity: item.quantity,
+          })),
+        }
+      )
 
       const order = orderResponse.data
 
-      // Step 2: Create payment
       const paymentResponse = await api.post(
         `/api/orders/${order.id}/payment`,
         {
@@ -127,348 +146,808 @@ function CheckoutPage() {
       )
 
       setPayment(paymentResponse.data)
-
     } catch (error) {
       setError(
         error.response?.data?.message ||
-        'Failed to place order.'
+          'Failed to place order.'
       )
     } finally {
       setPlacingOrder(false)
     }
   }
-    const processPayment = async (status) => {
-      if (!payment) {
-        return
-      }
 
-      try {
-        setProcessingPayment(true)
-        setError('')
-
-        const response = await api.patch(
-          `/api/orders/${payment.orderId}/payment`,
-          {
-            status,
-          }
-        )
-
-        if (response.data.status === 'SUCCESS') {
-          navigate(`/orders/${payment.orderId}`)
-        } else {
-          setPayment(response.data)
-        }
-
-      } catch (error) {
-        setError(
-          error.response?.data?.message ||
-          'Failed to process payment.'
-        )
-      } finally {
-        setProcessingPayment(false)
-      }
+  const processPayment = async (status) => {
+    if (!payment) {
+      return
     }
 
+    try {
+      setProcessingPayment(true)
+      setError('')
+
+      const response = await api.patch(
+        `/api/orders/${payment.orderId}/payment`,
+        {
+          status,
+        }
+      )
+
+      if (response.data.status === 'SUCCESS') {
+        navigate(`/orders/${payment.orderId}`)
+      } else {
+        setPayment(response.data)
+      }
+    } catch (error) {
+      setError(
+        error.response?.data?.message ||
+          'Failed to process payment.'
+      )
+    } finally {
+      setProcessingPayment(false)
+    }
+  }
+
+  const formatCurrency = (value) =>
+    Number(value || 0).toLocaleString('en-IN')
+
   if (loading) {
-    return <p>Loading checkout...</p>
+    return (
+      <main className="checkout-page">
+        <div className="checkout-container">
+          <div className="checkout-loading">
+            <span className="checkout-spinner" />
+            <p>Preparing your checkout...</p>
+          </div>
+        </div>
+      </main>
+    )
   }
 
   if (!cart) {
-    return <p>Cart not found.</p>
+    return (
+      <main className="checkout-page">
+        <div className="checkout-container">
+          <div className="checkout-error-state">
+            <h1>Checkout unavailable</h1>
+            <p>
+              {error || 'Cart not found.'}
+            </p>
+
+            <button
+              type="button"
+              onClick={() => navigate('/cart')}
+            >
+              Return to cart
+            </button>
+          </div>
+        </div>
+      </main>
+    )
   }
 
   if (cart.items.length === 0) {
-    return <p>Your cart is empty.</p>
+    return (
+      <main className="checkout-page">
+        <div className="checkout-container">
+          <div className="checkout-error-state">
+            <h1>Your cart is empty</h1>
+            <p>
+              Add something to your cart before
+              continuing to checkout.
+            </p>
+
+            <button
+              type="button"
+              onClick={() => navigate('/products')}
+            >
+              Browse products
+            </button>
+          </div>
+        </div>
+      </main>
+    )
   }
 
   return (
-    <div>
-      <h1>Checkout</h1>
+    <main className="checkout-page">
+      <div className="checkout-container">
 
-      {error && <p>{error}</p>}
+        {/* HEADER */}
+        <header className="checkout-header">
+          <div>
+            <span className="checkout-eyebrow">
+              NOVACART / CHECKOUT
+            </span>
 
-      <section>
-        <h2>Order Summary</h2>
+            <h1>Complete your order.</h1>
 
-        {cart.items.map((item) => (
-          <div key={item.id}>
-            <h3>{item.productName}</h3>
-
-            <p>Price: ₹{item.price}</p>
-
-            <p>Quantity: {item.quantity}</p>
-
-            <p>Subtotal: ₹{item.subtotal}</p>
+            <p>
+              Review your details and choose how
+              you'd like to pay.
+            </p>
           </div>
-        ))}
-
-        <h2>Total: ₹{cart.total}</h2>
-      </section>
-
-      <section>
-        <h2>Shipping Address</h2>
-
-        {addresses.length === 0 ? (
-          <p>No saved addresses found.</p>
-        ) : (
-          addresses.map((address) => (
-            <div key={address.id}>
-              <label>
-                <input
-                  type="radio"
-                  name="shippingAddress"
-                  value={address.id}
-                  checked={
-                    selectedAddressId === address.id
-                  }
-                  onChange={() =>
-                    setSelectedAddressId(address.id)
-                  }
-                />
-
-                <strong>{address.fullName}</strong>
-              </label>
-
-              <p>{address.phone}</p>
-
-              <p>{address.addressLine}</p>
-
-              <p>
-                {address.city}, {address.state}
-              </p>
-
-              <p>
-                {address.postalCode}, {address.country}
-              </p>
-
-              <p>Type: {address.type}</p>
-            </div>
-          ))
-        )}
-
-        <button
-          type="button"
-          onClick={() =>
-            setShowAddressForm(!showAddressForm)
-          }
-        >
-          {showAddressForm
-            ? 'Cancel'
-            : 'Add New Address'}
-        </button>
-
-        {showAddressForm && (
-          <form onSubmit={createAddress}>
-            <div>
-              <label>Full Name</label>
-
-              <input
-                name="fullName"
-                value={form.fullName}
-                onChange={handleChange}
-                required
-              />
-            </div>
-
-            <div>
-              <label>Phone</label>
-
-              <input
-                name="phone"
-                value={form.phone}
-                onChange={handleChange}
-                required
-              />
-            </div>
-
-            <div>
-              <label>Address</label>
-
-              <input
-                name="addressLine"
-                value={form.addressLine}
-                onChange={handleChange}
-                required
-              />
-            </div>
-
-            <div>
-              <label>City</label>
-
-              <input
-                name="city"
-                value={form.city}
-                onChange={handleChange}
-                required
-              />
-            </div>
-
-            <div>
-              <label>State</label>
-
-              <input
-                name="state"
-                value={form.state}
-                onChange={handleChange}
-                required
-              />
-            </div>
-
-            <div>
-              <label>Postal Code</label>
-
-              <input
-                name="postalCode"
-                value={form.postalCode}
-                onChange={handleChange}
-                required
-              />
-            </div>
-
-            <div>
-              <label>Country</label>
-
-              <input
-                name="country"
-                value={form.country}
-                onChange={handleChange}
-                required
-              />
-            </div>
-
-            <div>
-              <label>Address Type</label>
-
-              <select
-                name="type"
-                value={form.type}
-                onChange={handleChange}
-              >
-                <option value="HOME">HOME</option>
-                <option value="WORK">WORK</option>
-                <option value="OTHER">OTHER</option>
-              </select>
-            </div>
-
-            <button type="submit">
-              Save Address
-            </button>
-          </form>
-        )}
-      </section>
-
-      {!payment && addresses.length > 0 && (
-        <section>
-          <h2>Payment Method</h2>
-
-          <label>
-            <input
-              type="radio"
-              name="paymentMethod"
-              value="COD"
-              checked={paymentMethod === 'COD'}
-              onChange={(event) =>
-                setPaymentMethod(event.target.value)
-              }
-            />
-            Cash on Delivery
-          </label>
-
-          <br />
-
-          <label>
-            <input
-              type="radio"
-              name="paymentMethod"
-              value="UPI"
-              checked={paymentMethod === 'UPI'}
-              onChange={(event) =>
-                setPaymentMethod(event.target.value)
-              }
-            />
-            UPI
-          </label>
-
-          <br />
-
-          <label>
-            <input
-              type="radio"
-              name="paymentMethod"
-              value="CARD"
-              checked={paymentMethod === 'CARD'}
-              onChange={(event) =>
-                setPaymentMethod(event.target.value)
-              }
-            />
-            Card
-          </label>
-
-          <br />
 
           <button
             type="button"
-            disabled={!selectedAddressId || placingOrder}
-            onClick={placeOrder}
+            className="checkout-back"
+            onClick={() => navigate('/cart')}
           >
-            {placingOrder
-              ? 'Creating Order...'
-              : 'Continue to Payment'}
+            ← Back to cart
           </button>
-        </section>
-      )}
+        </header>
 
-       {payment && (
-         <section>
-           <h2>Payment</h2>
+        {/* ERROR */}
+        {error && (
+          <div className="checkout-alert">
+            <span>!</span>
+            <p>{error}</p>
 
-           <p>Order ID: {payment.orderId}</p>
+            <button
+              type="button"
+              onClick={() => setError('')}
+            >
+              ×
+            </button>
+          </div>
+        )}
 
-           <p>Amount: ₹{payment.amount}</p>
+        {/* PAYMENT RESULT */}
+        {payment ? (
+          <section className="payment-panel">
 
-           <p>Method: {payment.method}</p>
+            <div className="payment-panel-header">
+              <span className="checkout-eyebrow">
+                PAYMENT
+              </span>
 
-           <p>Status: {payment.status}</p>
+              <h2>Review your payment</h2>
 
-           {payment.status === 'PENDING' && (
-             <div>
-               <button
-                 type="button"
-                 disabled={processingPayment}
-                 onClick={() => processPayment('SUCCESS')}
-               >
-                 {processingPayment
-                   ? 'Processing...'
-                   : 'Pay Now'}
-               </button>
+              <p>
+                Your order has been created. Complete
+                the payment to finish your purchase.
+              </p>
+            </div>
 
-               <button
-                 type="button"
-                 disabled={processingPayment}
-                 onClick={() => processPayment('FAILED')}
-               >
-                 Simulate Failed Payment
-               </button>
-             </div>
-           )}
+            <div className="payment-info-grid">
+              <div>
+                <span>Order</span>
+                <strong>
+                  #{payment.orderId}
+                </strong>
+              </div>
 
-           {payment.status === 'SUCCESS' && (
-             <div>
-               <p>Payment successful.</p>
+              <div>
+                <span>Amount</span>
+                <strong>
+                  ₹{formatCurrency(payment.amount)}
+                </strong>
+              </div>
 
-               <p>
-                 Transaction ID: {payment.transactionId}
-               </p>
-             </div>
-           )}
+              <div>
+                <span>Method</span>
+                <strong>
+                  {payment.method}
+                </strong>
+              </div>
 
-           {payment.status === 'FAILED' && (
-             <p>Payment failed. Please try again.</p>
-           )}
-         </section>
-       )}
+              <div>
+                <span>Status</span>
+                <strong
+                  className={`payment-status ${String(
+                    payment.status
+                  ).toLowerCase()}`}
+                >
+                  {payment.status}
+                </strong>
+              </div>
+            </div>
 
-    </div>
+            {payment.status === 'PENDING' && (
+              <div className="payment-actions">
+
+                <button
+                  type="button"
+                  className="checkout-primary-button"
+                  disabled={processingPayment}
+                  onClick={() =>
+                    processPayment('SUCCESS')
+                  }
+                >
+                  <span>
+                    {processingPayment
+                      ? 'Processing...'
+                      : `Pay ₹${formatCurrency(
+                          payment.amount
+                        )}`}
+                  </span>
+
+                  <span>→</span>
+                </button>
+
+                <button
+                  type="button"
+                  className="payment-failed-button"
+                  disabled={processingPayment}
+                  onClick={() =>
+                    processPayment('FAILED')
+                  }
+                >
+                  Simulate failed payment
+                </button>
+              </div>
+            )}
+
+            {payment.status === 'SUCCESS' && (
+              <div className="payment-success">
+                <span>✓</span>
+
+                <div>
+                  <strong>
+                    Payment successful
+                  </strong>
+
+                  <p>
+                    Transaction ID:{' '}
+                    {payment.transactionId}
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {payment.status === 'FAILED' && (
+              <div className="payment-failed">
+                <strong>
+                  Payment failed
+                </strong>
+
+                <p>
+                  Please try again with the
+                  selected payment method.
+                </p>
+              </div>
+            )}
+          </section>
+        ) : (
+          <div className="checkout-layout">
+
+            {/* LEFT */}
+            <div className="checkout-main">
+
+              {/* ADDRESS */}
+              <section className="checkout-section">
+                <div className="checkout-section-heading">
+                  <div className="checkout-step">
+                    01
+                  </div>
+
+                  <div>
+                    <h2>
+                      Shipping address
+                    </h2>
+
+                    <p>
+                      Where should we deliver your
+                      order?
+                    </p>
+                  </div>
+                </div>
+
+                {addresses.length > 0 ? (
+                  <div className="address-grid">
+                    {addresses.map((address) => (
+                      <label
+                        key={address.id}
+                        className={`address-card ${
+                          selectedAddressId ===
+                          address.id
+                            ? 'selected'
+                            : ''
+                        }`}
+                      >
+                        <input
+                          type="radio"
+                          name="shippingAddress"
+                          checked={
+                            selectedAddressId ===
+                            address.id
+                          }
+                          onChange={() =>
+                            setSelectedAddressId(
+                              address.id
+                            )
+                          }
+                        />
+
+                        <div className="address-radio">
+                          <span />
+                        </div>
+
+                        <div className="address-content">
+                          <div className="address-title">
+                            <strong>
+                              {address.fullName}
+                            </strong>
+
+                            <span>
+                              {address.type}
+                            </span>
+                          </div>
+
+                          <p>
+                            {address.addressLine}
+                          </p>
+
+                          <p>
+                            {address.city},{' '}
+                            {address.state}{' '}
+                            {address.postalCode}
+                          </p>
+
+                          <p>
+                            {address.country}
+                          </p>
+
+                          <span className="address-phone">
+                            {address.phone}
+                          </span>
+                        </div>
+                      </label>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="no-address">
+                    <span>+</span>
+
+                    <div>
+                      <strong>
+                        No saved address
+                      </strong>
+
+                      <p>
+                        Add an address to continue.
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                <button
+                  type="button"
+                  className="add-address-button"
+                  onClick={() =>
+                    setShowAddressForm(
+                      !showAddressForm
+                    )
+                  }
+                >
+                  <span>
+                    {showAddressForm
+                      ? '−'
+                      : '+'}
+                  </span>
+
+                  {showAddressForm
+                    ? 'Cancel'
+                    : 'Add a new address'}
+                </button>
+
+                {showAddressForm && (
+                  <form
+                    className="address-form"
+                    onSubmit={createAddress}
+                  >
+                    <div className="form-grid">
+
+                      <div className="form-field">
+                        <label>
+                          Full name
+                        </label>
+
+                        <input
+                          name="fullName"
+                          value={form.fullName}
+                          onChange={handleChange}
+                          placeholder="Your full name"
+                          required
+                        />
+                      </div>
+
+                      <div className="form-field">
+                        <label>
+                          Phone
+                        </label>
+
+                        <input
+                          name="phone"
+                          value={form.phone}
+                          onChange={handleChange}
+                          placeholder="Phone number"
+                          required
+                        />
+                      </div>
+
+                      <div className="form-field full">
+                        <label>
+                          Address
+                        </label>
+
+                        <input
+                          name="addressLine"
+                          value={form.addressLine}
+                          onChange={handleChange}
+                          placeholder="House number, street, area"
+                          required
+                        />
+                      </div>
+
+                      <div className="form-field">
+                        <label>
+                          City
+                        </label>
+
+                        <input
+                          name="city"
+                          value={form.city}
+                          onChange={handleChange}
+                          placeholder="City"
+                          required
+                        />
+                      </div>
+
+                      <div className="form-field">
+                        <label>
+                          State
+                        </label>
+
+                        <input
+                          name="state"
+                          value={form.state}
+                          onChange={handleChange}
+                          placeholder="State"
+                          required
+                        />
+                      </div>
+
+                      <div className="form-field">
+                        <label>
+                          Postal code
+                        </label>
+
+                        <input
+                          name="postalCode"
+                          value={form.postalCode}
+                          onChange={handleChange}
+                          placeholder="Postal code"
+                          required
+                        />
+                      </div>
+
+                      <div className="form-field">
+                        <label>
+                          Address type
+                        </label>
+
+                        <select
+                          name="type"
+                          value={form.type}
+                          onChange={handleChange}
+                        >
+                          <option value="HOME">
+                            Home
+                          </option>
+
+                          <option value="WORK">
+                            Work
+                          </option>
+
+                          <option value="OTHER">
+                            Other
+                          </option>
+                        </select>
+                      </div>
+
+                      <div className="form-field">
+                        <label>
+                          Country
+                        </label>
+
+                        <input
+                          name="country"
+                          value={form.country}
+                          onChange={handleChange}
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    <button
+                      type="submit"
+                      className="save-address-button"
+                    >
+                      Save address
+                    </button>
+                  </form>
+                )}
+              </section>
+
+              {/* PAYMENT */}
+              <section className="checkout-section">
+                <div className="checkout-section-heading">
+                  <div className="checkout-step">
+                    02
+                  </div>
+
+                  <div>
+                    <h2>
+                      Payment method
+                    </h2>
+
+                    <p>
+                      Choose your preferred payment
+                      method.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="payment-methods">
+
+                  <label
+                    className={`payment-method ${
+                      paymentMethod === 'COD'
+                        ? 'selected'
+                        : ''
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="paymentMethod"
+                      value="COD"
+                      checked={
+                        paymentMethod === 'COD'
+                      }
+                      onChange={(event) =>
+                        setPaymentMethod(
+                          event.target.value
+                        )
+                      }
+                    />
+
+                    <span className="payment-method-icon">
+                      ₹
+                    </span>
+
+                    <span className="payment-method-content">
+                      <strong>
+                        Cash on Delivery
+                      </strong>
+
+                      <small>
+                        Pay when your order arrives
+                      </small>
+                    </span>
+
+                    <span className="payment-radio" />
+                  </label>
+
+                  <label
+                    className={`payment-method ${
+                      paymentMethod === 'UPI'
+                        ? 'selected'
+                        : ''
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="paymentMethod"
+                      value="UPI"
+                      checked={
+                        paymentMethod === 'UPI'
+                      }
+                      onChange={(event) =>
+                        setPaymentMethod(
+                          event.target.value
+                        )
+                      }
+                    />
+
+                    <span className="payment-method-icon">
+                      U
+                    </span>
+
+                    <span className="payment-method-content">
+                      <strong>
+                        UPI
+                      </strong>
+
+                      <small>
+                        Pay securely using UPI
+                      </small>
+                    </span>
+
+                    <span className="payment-radio" />
+                  </label>
+
+                  <label
+                    className={`payment-method ${
+                      paymentMethod === 'CARD'
+                        ? 'selected'
+                        : ''
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="paymentMethod"
+                      value="CARD"
+                      checked={
+                        paymentMethod === 'CARD'
+                      }
+                      onChange={(event) =>
+                        setPaymentMethod(
+                          event.target.value
+                        )
+                      }
+                    />
+
+                    <span className="payment-method-icon">
+                      ▣
+                    </span>
+
+                    <span className="payment-method-content">
+                      <strong>
+                        Credit / Debit Card
+                      </strong>
+
+                      <small>
+                        Visa, Mastercard and more
+                      </small>
+                    </span>
+
+                    <span className="payment-radio" />
+                  </label>
+
+                </div>
+              </section>
+            </div>
+
+            {/* RIGHT SUMMARY */}
+            <aside className="checkout-summary">
+
+              <div className="summary-heading">
+                <span className="checkout-eyebrow">
+                  YOUR ORDER
+                </span>
+
+                <h2>
+                  Order summary
+                </h2>
+              </div>
+
+              <div className="summary-products">
+                {cart.items.map((item) => (
+                  <div
+                    className="summary-product"
+                    key={item.id}
+                  >
+                    <div className="summary-product-image">
+                      {item.imageUrl ? (
+                        <img
+                          src={item.imageUrl}
+                          alt={item.productName}
+                        />
+                      ) : (
+                        <span>
+                          Nova
+                        </span>
+                      )}
+
+                      <small>
+                        {item.quantity}
+                      </small>
+                    </div>
+
+                    <div className="summary-product-info">
+                      <strong>
+                        {item.productName}
+                      </strong>
+
+                      <span>
+                        ₹
+                        {formatCurrency(
+                          item.price
+                        )}{' '}
+                        × {item.quantity}
+                      </span>
+                    </div>
+
+                    <strong>
+                      ₹
+                      {formatCurrency(
+                        item.subtotal
+                      )}
+                    </strong>
+                  </div>
+                ))}
+              </div>
+
+              <div className="summary-divider" />
+
+              <div className="summary-lines">
+                <div>
+                  <span>Subtotal</span>
+
+                  <strong>
+                    ₹
+                    {formatCurrency(
+                      cart.total
+                    )}
+                  </strong>
+                </div>
+
+                <div>
+                  <span>Delivery</span>
+
+                  <strong className="free">
+                    FREE
+                  </strong>
+                </div>
+              </div>
+
+              <div className="summary-total">
+                <div>
+                  <strong>
+                    Total
+                  </strong>
+
+                  <small>
+                    Inclusive of applicable taxes
+                  </small>
+                </div>
+
+                <strong>
+                  ₹
+                  {formatCurrency(
+                    cart.total
+                  )}
+                </strong>
+              </div>
+
+              <button
+                type="button"
+                className="checkout-primary-button"
+                disabled={
+                  !selectedAddressId ||
+                  placingOrder
+                }
+                onClick={placeOrder}
+              >
+                <span>
+                  {placingOrder
+                    ? 'Creating order...'
+                    : 'Continue to payment'}
+                </span>
+
+                <span>→</span>
+              </button>
+
+              <div className="checkout-security">
+                <span>✓</span>
+
+                <div>
+                  <strong>
+                    Secure checkout
+                  </strong>
+
+                  <small>
+                    Your order information is
+                    protected.
+                  </small>
+                </div>
+              </div>
+
+            </aside>
+          </div>
+        )}
+      </div>
+    </main>
   )
 }
 

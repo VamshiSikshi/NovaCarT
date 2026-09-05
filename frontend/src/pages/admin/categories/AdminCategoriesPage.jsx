@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import api from '../../../api/axios'
+import '../../../styles/admin/admin-categories.css'
 
 const emptyForm = {
   name: '',
@@ -38,7 +39,7 @@ function AdminCategoriesPage() {
     } catch (error) {
       setError(
         error.response?.data?.message ||
-        'Failed to load categories.'
+          'Failed to load categories.'
       )
     } finally {
       setLoading(false)
@@ -76,6 +77,8 @@ function AdminCategoriesPage() {
   }
 
   const closeForm = () => {
+    if (saving) return
+
     setShowForm(false)
     setEditingCategoryId(null)
     setForm({ ...emptyForm })
@@ -109,12 +112,15 @@ function AdminCategoriesPage() {
         )
       }
 
-      closeForm()
+      setShowForm(false)
+      setEditingCategoryId(null)
+      setForm({ ...emptyForm })
+
       await loadCategories()
     } catch (error) {
       setError(
         error.response?.data?.message ||
-        'Failed to save category.'
+          'Failed to save category.'
       )
     } finally {
       setSaving(false)
@@ -146,175 +152,241 @@ function AdminCategoriesPage() {
     } catch (error) {
       setError(
         error.response?.data?.message ||
-        'Failed to delete category.'
+          'Failed to delete category.'
       )
     }
   }
 
   if (loading) {
     return (
-      <div className="admin-page-state">
-        <div className="admin-spinner"></div>
+      <div className="categories-page-state">
+        <span className="categories-spinner" />
         <p>Loading categories...</p>
       </div>
     )
   }
 
   return (
-    <div className="admin-page">
+    <div className="categories-page">
 
       {/* =========================
-          PAGE HEADER
-          ========================= */}
+          HEADER
+         ========================= */}
 
-      <div className="admin-page-header">
+      <header className="categories-header">
 
-        <div>
-          <p className="admin-eyebrow">
-            Catalog management
+        <div className="categories-heading">
+
+          <p className="categories-eyebrow">
+            CATALOG / ORGANIZATION
           </p>
 
-          <h1>Categories</h1>
+          <h1>
+            Categories<span>.</span>
+          </h1>
 
-          <p className="admin-page-description">
-            Manage your product categories.
+          <p className="categories-description">
+            Organize your product catalog into clear,
+            manageable collections.
           </p>
+
         </div>
 
         <button
           type="button"
-          className="admin-primary-button"
+          className="categories-add-button"
           onClick={openCreateForm}
         >
-          + Add Category
+          <span className="categories-add-icon">
+            +
+          </span>
+
+          Add category
         </button>
 
-      </div>
+      </header>
 
 
       {/* =========================
           ALERTS
-          ========================= */}
+         ========================= */}
 
       {error && (
-        <div className="admin-alert admin-alert-error">
+        <div className="categories-alert categories-alert-error">
           <span>!</span>
-          {error}
+          <p>{error}</p>
         </div>
       )}
 
       {success && (
-        <div className="admin-alert admin-alert-success">
+        <div className="categories-alert categories-alert-success">
           <span>✓</span>
-          {success}
+          <p>{success}</p>
         </div>
       )}
 
 
       {/* =========================
-          CATEGORY TABLE
-          ========================= */}
+          CONTENT
+         ========================= */}
 
-      <section className="admin-table-card">
+      <section className="categories-content">
 
-        <div className="admin-table-header">
+        <div className="categories-content-header">
+
           <div>
-            <h2>Category Catalog</h2>
+            <p className="categories-section-label">
+              COLLECTIONS
+            </p>
+
+            <h2>Category catalog</h2>
+          </div>
+
+          <div className="categories-count">
+            <strong>
+              {categories.length}
+            </strong>
 
             <span>
-              {categories.length}{' '}
               {categories.length === 1
                 ? 'category'
                 : 'categories'}
             </span>
           </div>
+
         </div>
 
-        {categories.length === 0 ? (
-          <div className="admin-empty-state">
 
-            <div className="admin-empty-icon">
-              C
+        {categories.length === 0 ? (
+          <div className="categories-empty">
+
+            <div className="categories-empty-mark">
+              <span />
+              <span />
+              <span />
             </div>
 
-            <h3>No categories found</h3>
+            <h3>Your catalog is empty</h3>
 
             <p>
-              Create your first category to organize
-              your products.
+              Create your first category to start
+              organizing your products.
             </p>
 
             <button
               type="button"
-              className="admin-primary-button"
+              className="categories-add-button"
               onClick={openCreateForm}
             >
-              + Add Category
+              <span className="categories-add-icon">
+                +
+              </span>
+
+              Create category
             </button>
 
           </div>
         ) : (
-          <div className="admin-table-wrapper">
+          <div className="categories-table-wrapper">
 
-            <table className="admin-table">
+            <table className="categories-table">
 
               <thead>
                 <tr>
-                  <th>ID</th>
-                  <th>Category</th>
-                  <th>Description</th>
-                  <th>Actions</th>
+                  <th className="categories-id-column">
+                    ID
+                  </th>
+
+                  <th>
+                    Category
+                  </th>
+
+                  <th>
+                    Description
+                  </th>
+
+                  <th className="categories-actions-column">
+                    Actions
+                  </th>
                 </tr>
               </thead>
 
               <tbody>
 
-                {categories.map((category) => (
-                  <tr key={category.id}>
+                {categories.map((category, index) => (
+                  <tr
+                    key={category.id}
+                    style={{
+                      animationDelay: `${index * 45}ms`,
+                    }}
+                  >
 
                     <td>
-                      #{category.id}
+                      <span className="categories-id">
+                        #{String(category.id).padStart(
+                          2,
+                          '0'
+                        )}
+                      </span>
                     </td>
 
                     <td>
-                      <strong>
-                        {category.name}
-                      </strong>
+                      <div className="category-name-cell">
+
+                        <div className="category-avatar">
+                          {category.name
+                            ?.charAt(0)
+                            ?.toUpperCase() || 'C'}
+                        </div>
+
+                        <div>
+                          <strong>
+                            {category.name}
+                          </strong>
+
+                          <span>
+                            Product collection
+                          </span>
+                        </div>
+
+                      </div>
                     </td>
 
                     <td>
-                      {category.description ||
-                        'No description'}
+                      <p className="category-description">
+                        {category.description ||
+                          'No description added'}
+                      </p>
                     </td>
 
                     <td>
-
-                      <div className="admin-actions">
+                      <div className="category-actions">
 
                         <button
                           type="button"
-                          className="admin-action-button edit"
+                          className="category-edit-button"
                           onClick={() =>
                             openEditForm(category)
                           }
                         >
+                          <span>↗</span>
                           Edit
                         </button>
 
                         <button
                           type="button"
-                          className="admin-action-button delete"
+                          className="category-delete-button"
                           onClick={() =>
                             deleteCategory(
                               category.id
                             )
                           }
+                          aria-label={`Delete ${category.name}`}
                         >
-                          Delete
+                          ×
                         </button>
 
                       </div>
-
                     </td>
 
                   </tr>
@@ -331,32 +403,83 @@ function AdminCategoriesPage() {
 
 
       {/* =========================
-          CREATE / EDIT MODAL
-          ========================= */}
+          FOOTER INFO
+         ========================= */}
+
+      {categories.length > 0 && (
+        <div className="categories-footer-note">
+
+          <div className="categories-footer-icon">
+            ✓
+          </div>
+
+          <div>
+            <strong>
+              Catalog organization
+            </strong>
+
+            <p>
+              Categories help customers discover
+              products faster.
+            </p>
+          </div>
+
+        </div>
+      )}
+
+
+      {/* =========================
+          MODAL
+         ========================= */}
 
       {showForm && (
-        <div className="admin-modal-overlay">
+        <div
+          className="categories-modal-overlay"
+          onMouseDown={(event) => {
+            if (
+              event.target === event.currentTarget &&
+              !saving
+            ) {
+              closeForm()
+            }
+          }}
+        >
 
-          <div className="admin-modal">
+          <div
+            className="categories-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="category-modal-title"
+          >
 
-            <div className="admin-modal-header">
+            <div className="categories-modal-top">
 
               <div>
-                <p className="admin-eyebrow">
-                  Catalog management
+
+                <p className="categories-eyebrow">
+                  CATALOG / CATEGORY
                 </p>
 
-                <h2>
+                <h2 id="category-modal-title">
                   {editingCategoryId
-                    ? 'Edit Category'
-                    : 'Create Category'}
+                    ? 'Edit category'
+                    : 'Create category'}
+                  <span>.</span>
                 </h2>
+
+                <p>
+                  {editingCategoryId
+                    ? 'Update the information for this category.'
+                    : 'Add a new collection to your catalog.'}
+                </p>
+
               </div>
 
               <button
                 type="button"
-                className="admin-modal-close"
+                className="categories-modal-close"
                 onClick={closeForm}
+                disabled={saving}
                 aria-label="Close"
               >
                 ×
@@ -366,35 +489,49 @@ function AdminCategoriesPage() {
 
 
             <form
-              className="admin-product-form"
+              className="categories-form"
               onSubmit={saveCategory}
             >
 
-              <div className="admin-form-group">
+              <div className="categories-form-group">
 
                 <label htmlFor="category-name">
-                  Category Name
+                  Category name
                 </label>
 
                 <input
                   id="category-name"
                   name="name"
+                  type="text"
                   value={form.name}
                   onChange={handleChange}
                   maxLength={50}
                   required
                   autoFocus
-                  placeholder="Enter category name"
+                  placeholder="e.g. Electronics"
                 />
+
+                <span>
+                  Give your category a clear,
+                  recognizable name.
+                </span>
 
               </div>
 
 
-              <div className="admin-form-group">
+              <div className="categories-form-group">
 
-                <label htmlFor="category-description">
-                  Description
-                </label>
+                <div className="categories-label-row">
+
+                  <label htmlFor="category-description">
+                    Description
+                  </label>
+
+                  <span>
+                    {form.description.length}/500
+                  </span>
+
+                </div>
 
                 <textarea
                   id="category-description"
@@ -403,17 +540,17 @@ function AdminCategoriesPage() {
                   onChange={handleChange}
                   maxLength={500}
                   rows={5}
-                  placeholder="Enter category description"
+                  placeholder="Describe what kind of products belong in this category..."
                 />
 
               </div>
 
 
-              <div className="admin-modal-actions">
+              <div className="categories-modal-footer">
 
                 <button
                   type="button"
-                  className="admin-secondary-button"
+                  className="categories-cancel-button"
                   onClick={closeForm}
                   disabled={saving}
                 >
@@ -422,14 +559,23 @@ function AdminCategoriesPage() {
 
                 <button
                   type="submit"
-                  className="admin-primary-button"
+                  className="categories-save-button"
                   disabled={saving}
                 >
-                  {saving
-                    ? 'Saving...'
-                    : editingCategoryId
-                      ? 'Update Category'
-                      : 'Create Category'}
+                  {saving ? (
+                    <>
+                      <span className="categories-button-spinner" />
+                      Saving...
+                    </>
+                  ) : (
+                    <>
+                      {editingCategoryId
+                        ? 'Save changes'
+                        : 'Create category'}
+
+                      <span>→</span>
+                    </>
+                  )}
                 </button>
 
               </div>

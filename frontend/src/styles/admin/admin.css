@@ -1,0 +1,1938 @@
+/* =========================================================
+   NOVACART ADMIN — GLOBAL SHELL
+   ---------------------------------------------------------
+   Contains:
+   - Admin layout
+   - Sidebar
+   - Header
+   - Navigation
+   - Global typography
+   - Shared states / alerts / buttons
+   - Responsive shell
+   ---------------------------------------------------------
+   Page-specific styles belong in:
+   admin-dashboard.css
+   admin-categories.css
+   admin-products.css
+   admin-orders.css
+   admin-ordersDetails.css
+   admin-payments.css
+   admin-paymentsDetails.css
+   admin-users.css
+========================================================= */
+
+
+/* =========================================================
+   01. DESIGN TOKENS
+========================================================= */
+
+.admin-layout {
+  --admin-sidebar-width: 256px;
+  --admin-header-height: 76px;
+
+  --admin-bg: #f6f6f4;
+  --admin-surface: #ffffff;
+  --admin-surface-soft: #fbfafc;
+
+  --admin-text: #151218;
+  --admin-text-secondary: #655f6c;
+  --admin-text-muted: #8b8492;
+
+  --admin-border: #e6e2ea;
+  --admin-border-strong: #ddd8e4;
+
+  --admin-purple: #7741eb;
+  --admin-purple-dark: #6430d4;
+  --admin-purple-soft: #f1ebff;
+  --admin-purple-border: #ddceff;
+
+  --admin-green: #15945f;
+  --admin-green-soft: #eaf8f1;
+
+  --admin-red: #d94343;
+  --admin-red-soft: #fff0f0;
+
+  --admin-yellow: #b77908;
+  --admin-yellow-soft: #fff7df;
+
+  --admin-blue: #3275c8;
+  --admin-blue-soft: #edf5ff;
+
+  --admin-shadow-sm:
+    0 2px 8px rgba(25, 18, 36, 0.04);
+
+  --admin-shadow:
+    0 12px 35px rgba(25, 18, 36, 0.07);
+
+  --admin-shadow-purple:
+    0 12px 28px rgba(119, 65, 235, 0.20);
+
+  min-height: 100vh;
+
+  background: var(--admin-bg);
+  color: var(--admin-text);
+
+  font-family:
+    "Inter",
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+
+  font-size: 14px;
+  line-height: 1.5;
+
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  text-rendering: optimizeLegibility;
+}
+
+
+/* =========================================================
+   02. GLOBAL RESET INSIDE ADMIN
+========================================================= */
+
+.admin-layout *,
+.admin-layout *::before,
+.admin-layout *::after {
+  box-sizing: border-box;
+}
+
+.admin-layout h1,
+.admin-layout h2,
+.admin-layout h3,
+.admin-layout h4,
+.admin-layout h5,
+.admin-layout h6 {
+  margin: 0;
+
+  font-family:
+    "Manrope",
+    "Inter",
+    ui-sans-serif,
+    system-ui,
+    sans-serif;
+
+  color: var(--admin-text);
+
+  font-weight: 800;
+  letter-spacing: -0.035em;
+}
+
+.admin-layout p {
+  margin: 0;
+}
+
+.admin-layout button,
+.admin-layout input,
+.admin-layout select,
+.admin-layout textarea {
+  font: inherit;
+}
+
+.admin-layout button {
+  cursor: pointer;
+}
+
+.admin-layout a {
+  color: inherit;
+}
+
+.admin-layout img {
+  max-width: 100%;
+}
+
+.admin-layout :disabled {
+  cursor: not-allowed;
+}
+
+
+/* =========================================================
+   03. MAIN LAYOUT
+========================================================= */
+
+.admin-main {
+  width: calc(100% - var(--admin-sidebar-width));
+  min-height: 100vh;
+
+  margin-left: var(--admin-sidebar-width);
+}
+
+
+/* =========================================================
+   04. SIDEBAR
+========================================================= */
+
+.admin-sidebar {
+  position: fixed;
+  inset: 0 auto 0 0;
+
+  z-index: 100;
+
+  width: var(--admin-sidebar-width);
+  height: 100vh;
+
+  display: flex;
+  flex-direction: column;
+
+  overflow: hidden;
+
+  background: #11171b;
+  color: #ffffff;
+
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+
+/* =========================================================
+   SIDEBAR TOP
+========================================================= */
+
+.admin-sidebar-top {
+  padding: 24px 18px 20px;
+
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.admin-sidebar-brand-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.admin-sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  min-width: 0;
+
+  color: #ffffff;
+  text-decoration: none;
+}
+
+.admin-brand-symbol {
+  width: 43px;
+  height: 43px;
+
+  display: grid;
+  place-items: center;
+
+  flex-shrink: 0;
+
+  border-radius: 11px;
+
+  background: linear-gradient(
+    145deg,
+    #8654f3,
+    #6c35df
+  );
+
+  color: #ffffff;
+
+  font-family: "Manrope", sans-serif;
+  font-size: 18px;
+  font-weight: 800;
+
+  box-shadow:
+    0 8px 22px rgba(119, 65, 235, 0.30),
+    inset 0 1px 0 rgba(255, 255, 255, 0.20);
+}
+
+.admin-brand-copy {
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.admin-brand-copy strong {
+  overflow: hidden;
+
+  color: #ffffff;
+
+  font-family: "Manrope", sans-serif;
+  font-size: 18px;
+  font-weight: 800;
+  line-height: 1.1;
+
+  letter-spacing: -0.04em;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-brand-copy small {
+  color: #8d979d;
+
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+.admin-sidebar-close {
+  display: none;
+
+  width: 34px;
+  height: 34px;
+
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 9px;
+
+  background: transparent;
+  color: #ffffff;
+
+  font-size: 20px;
+}
+
+
+/* =========================================================
+   05. WORKSPACE SWITCHER
+========================================================= */
+
+.admin-workspace-switcher {
+  min-height: 59px;
+
+  margin-top: 20px;
+  padding: 9px 10px;
+
+  display: flex;
+  align-items: center;
+  gap: 11px;
+
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 11px;
+
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.admin-workspace-icon {
+  width: 35px;
+  height: 35px;
+
+  display: grid;
+  place-items: center;
+
+  flex-shrink: 0;
+
+  border-radius: 9px;
+
+  background: rgba(119, 65, 235, 0.16);
+  color: #c6b5ff;
+}
+
+.admin-workspace-copy {
+  min-width: 0;
+  flex: 1;
+
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.admin-workspace-copy strong {
+  color: #eef0f2;
+
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.admin-workspace-copy small {
+  color: #7f898f;
+
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 1.25;
+}
+
+.admin-workspace-chevron {
+  flex-shrink: 0;
+
+  color: #7f898f;
+
+  font-size: 15px;
+}
+
+
+/* =========================================================
+   06. SIDEBAR NAVIGATION
+========================================================= */
+
+.admin-sidebar-body {
+  flex: 1;
+  min-height: 0;
+
+  overflow-y: auto;
+
+  padding: 28px 14px;
+
+  scrollbar-width: thin;
+  scrollbar-color: #3a4247 transparent;
+}
+
+.admin-sidebar-body::-webkit-scrollbar {
+  width: 5px;
+}
+
+.admin-sidebar-body::-webkit-scrollbar-thumb {
+  background: #3a4247;
+  border-radius: 999px;
+}
+
+.admin-sidebar-section {
+  margin: 0 10px 12px;
+
+  color: #78838a;
+
+  font-size: 11px;
+  font-weight: 750;
+  line-height: 1.2;
+
+  letter-spacing: 0.14em;
+
+  text-transform: uppercase;
+}
+
+.admin-sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.admin-nav-link {
+  position: relative;
+
+  min-height: 48px;
+
+  padding: 0 11px;
+
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  border: 1px solid transparent;
+  border-radius: 10px;
+
+  color: #aeb7bc;
+
+  text-decoration: none;
+
+  transition:
+    background 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease,
+    transform 160ms ease;
+}
+
+.admin-nav-link:hover {
+  background: rgba(255, 255, 255, 0.055);
+
+  color: #ffffff;
+
+  transform: translateX(2px);
+}
+
+.admin-nav-link.active {
+  background: linear-gradient(
+    135deg,
+    #824cf1,
+    #7139e5
+  );
+
+  border-color: rgba(255, 255, 255, 0.10);
+
+  color: #ffffff;
+
+  box-shadow:
+    0 8px 22px rgba(119, 65, 235, 0.23);
+}
+
+.admin-nav-icon {
+  width: 35px;
+  height: 35px;
+
+  display: grid;
+  place-items: center;
+
+  flex-shrink: 0;
+
+  border-radius: 9px;
+
+  color: currentColor;
+}
+
+.admin-nav-link.active .admin-nav-icon {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.admin-nav-icon svg {
+  width: 19px;
+  height: 19px;
+
+  display: block;
+
+  fill: none;
+  stroke: currentColor;
+
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.admin-nav-label {
+  min-width: 0;
+  flex: 1;
+
+  color: currentColor;
+
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.admin-nav-link.active .admin-nav-label {
+  font-weight: 750;
+}
+
+.admin-nav-active-indicator {
+  width: 6px;
+  height: 6px;
+
+  flex-shrink: 0;
+
+  border-radius: 50%;
+
+  background: transparent;
+}
+
+.admin-nav-link.active .admin-nav-active-indicator {
+  background: #ffffff;
+
+  box-shadow:
+    0 0 10px rgba(255, 255, 255, 0.85);
+}
+
+
+/* =========================================================
+   07. SIDEBAR FOOTER
+========================================================= */
+
+.admin-sidebar-bottom {
+  padding: 16px;
+
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.admin-sidebar-status {
+  min-height: 67px;
+
+  padding: 11px;
+
+  display: flex;
+  align-items: center;
+  gap: 11px;
+
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 11px;
+
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.admin-sidebar-status-icon {
+  width: 35px;
+  height: 35px;
+
+  display: grid;
+  place-items: center;
+
+  flex-shrink: 0;
+
+  border-radius: 9px;
+
+  background: rgba(53, 201, 130, 0.08);
+}
+
+.admin-sidebar-status-icon span {
+  width: 9px;
+  height: 9px;
+
+  display: block;
+
+  border-radius: 50%;
+
+  background: #35c982;
+
+  box-shadow:
+    0 0 0 4px rgba(53, 201, 130, 0.10);
+}
+
+.admin-sidebar-status-copy {
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.admin-sidebar-status-copy strong {
+  color: #e9edef;
+
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.admin-sidebar-status-copy small {
+  overflow: hidden;
+
+  color: #7e898f;
+
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 1.3;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-sidebar-logout {
+  width: 100%;
+  min-height: 46px;
+
+  margin-top: 7px;
+  padding: 0 5px;
+
+  display: flex;
+  align-items: center;
+  gap: 9px;
+
+  border: 0;
+  border-radius: 9px;
+
+  background: transparent;
+
+  color: #aeb7bc;
+
+  font-size: 13px;
+  font-weight: 600;
+
+  text-align: left;
+
+  transition:
+    background 160ms ease,
+    color 160ms ease;
+}
+
+.admin-sidebar-logout:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: #ffffff;
+}
+
+.admin-sidebar-logout .admin-nav-icon {
+  width: 35px;
+}
+
+.admin-sidebar-meta {
+  padding: 12px 5px 0;
+
+  display: flex;
+  justify-content: space-between;
+
+  color: #596369;
+
+  font-size: 10px;
+  font-weight: 500;
+}
+
+
+/* =========================================================
+   08. HEADER
+========================================================= */
+
+.admin-header {
+  position: sticky;
+  top: 0;
+
+  z-index: 80;
+
+  width: 100%;
+  height: var(--admin-header-height);
+
+  padding: 0 30px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+
+  background: rgba(255, 255, 255, 0.96);
+
+  border-bottom: 1px solid var(--admin-border);
+
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.admin-header-left,
+.admin-header-right {
+  display: flex;
+  align-items: center;
+}
+
+.admin-header-left {
+  min-width: 0;
+  gap: 14px;
+}
+
+.admin-header-page {
+  min-width: 0;
+}
+
+
+/* =========================================================
+   BREADCRUMB
+========================================================= */
+
+.admin-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+
+  color: #8a9298;
+
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+.admin-breadcrumb strong {
+  color: #555d63;
+  font-weight: 650;
+}
+
+.admin-breadcrumb-separator {
+  color: #b4bac0;
+}
+
+
+/* =========================================================
+   HEADER TITLE
+========================================================= */
+
+.admin-header h1 {
+  margin-top: 3px;
+
+  color: #15171a;
+
+  font-family:
+    "Manrope",
+    "Inter",
+    sans-serif;
+
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1.15;
+
+  letter-spacing: -0.045em;
+}
+
+
+/* =========================================================
+   09. HEADER SEARCH
+========================================================= */
+
+.admin-header-right {
+  gap: 12px;
+}
+
+.admin-search {
+  width: 300px;
+  height: 42px;
+
+  padding: 0 11px;
+
+  display: flex;
+  align-items: center;
+  gap: 9px;
+
+  border: 1px solid #dfe2e5;
+  border-radius: 10px;
+
+  background: #fafafa;
+
+  color: #7d858b;
+
+  transition:
+    border-color 160ms ease,
+    background 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.admin-search:focus-within {
+  border-color: rgba(119, 65, 235, 0.45);
+
+  background: #ffffff;
+
+  box-shadow:
+    0 0 0 3px rgba(119, 65, 235, 0.08);
+}
+
+.admin-search svg {
+  width: 18px !important;
+  height: 18px !important;
+
+  min-width: 18px;
+  max-width: 18px;
+
+  min-height: 18px;
+  max-height: 18px;
+
+  display: block;
+
+  flex-shrink: 0;
+
+  fill: none !important;
+
+  stroke: currentColor !important;
+  stroke-width: 1.8;
+
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.admin-search input {
+  min-width: 0;
+  flex: 1;
+
+  height: 100%;
+
+  padding: 0;
+
+  border: 0;
+  outline: 0;
+
+  background: transparent;
+
+  color: #25292d;
+
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.admin-search input::placeholder {
+  color: #969da2;
+}
+
+.admin-search kbd {
+  flex-shrink: 0;
+
+  padding: 4px 6px;
+
+  border: 1px solid #e0e3e5;
+  border-radius: 5px;
+
+  background: #ffffff;
+  color: #858c91;
+
+  font-family: inherit;
+
+  font-size: 10px;
+  font-weight: 650;
+  line-height: 1;
+}
+
+
+/* =========================================================
+   10. HEADER ICON BUTTON
+========================================================= */
+
+.admin-icon-button {
+  position: relative;
+
+  width: 40px;
+  height: 40px;
+
+  display: grid;
+  place-items: center;
+
+  padding: 0;
+
+  border: 1px solid transparent;
+  border-radius: 9px;
+
+  background: transparent;
+
+  color: #555c62;
+
+  transition:
+    border-color 160ms ease,
+    background 160ms ease,
+    color 160ms ease;
+}
+
+.admin-icon-button:hover {
+  border-color: #e0e2e4;
+  background: #f7f7f8;
+  color: #25292d;
+}
+
+.admin-icon-button svg {
+  width: 19px !important;
+  height: 19px !important;
+
+  min-width: 19px;
+  max-width: 19px;
+
+  min-height: 19px;
+  max-height: 19px;
+
+  display: block;
+
+  flex-shrink: 0;
+
+  fill: none !important;
+
+  stroke: currentColor !important;
+
+  stroke-width: 1.8;
+
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.admin-notification-dot {
+  position: absolute;
+
+  top: 7px;
+  right: 7px;
+
+  width: 6px;
+  height: 6px;
+
+  border: 1px solid #ffffff;
+  border-radius: 50%;
+
+  background: var(--admin-purple);
+}
+
+
+/* =========================================================
+   HEADER DIVIDER
+========================================================= */
+
+.admin-header-divider {
+  width: 1px;
+  height: 30px;
+
+  flex-shrink: 0;
+
+  background: #e1e3e5;
+}
+
+
+/* =========================================================
+   11. HEADER USER
+========================================================= */
+
+.admin-user-menu {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  min-width: 0;
+}
+
+.admin-header-avatar {
+  width: 39px;
+  height: 39px;
+
+  display: grid;
+  place-items: center;
+
+  flex-shrink: 0;
+
+  border: 1px solid #d8cbff;
+  border-radius: 50%;
+
+  background: #f0eaff;
+  color: #7045d5;
+
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.admin-user-info {
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.admin-user-info strong {
+  max-width: 150px;
+
+  overflow: hidden;
+
+  color: #1a1d20;
+
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.25;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-user-info span {
+  color: #8c9398;
+
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 1.25;
+}
+
+.admin-user-chevron {
+  color: #8c9499;
+
+  font-size: 14px;
+}
+
+
+/* =========================================================
+   LOGOUT
+========================================================= */
+
+.admin-logout-button {
+  height: 39px;
+
+  padding: 0 15px;
+
+  flex-shrink: 0;
+
+  border: 1px solid #dfe2e4;
+  border-radius: 9px;
+
+  background: #ffffff;
+
+  color: #3d4449;
+
+  font-size: 12px;
+  font-weight: 700;
+
+  transition:
+    border-color 160ms ease,
+    background 160ms ease,
+    color 160ms ease,
+    transform 160ms ease;
+}
+
+.admin-logout-button:hover {
+  border-color: #d0c4f0;
+
+  background: #f7f4ff;
+
+  color: #6842ce;
+
+  transform: translateY(-1px);
+}
+
+
+/* =========================================================
+   12. MOBILE MENU
+========================================================= */
+
+.admin-mobile-menu {
+  display: none;
+
+  width: 40px;
+  height: 40px;
+
+  padding: 9px;
+
+  border: 1px solid #dfe2e4;
+  border-radius: 9px;
+
+  background: #ffffff;
+}
+
+.admin-mobile-menu span {
+  display: block;
+
+  width: 100%;
+  height: 2px;
+
+  margin: 4px 0;
+
+  border-radius: 2px;
+
+  background: #33383d;
+}
+
+
+/* =========================================================
+   13. CONTENT FOUNDATION
+========================================================= */
+
+.admin-content {
+  width: 100%;
+  max-width: 1520px;
+
+  margin: 0 auto;
+
+  padding: 34px 30px 60px;
+}
+
+
+/* =========================================================
+   14. SHARED PAGE TYPOGRAPHY
+========================================================= */
+
+.admin-page-header,
+.admin-page-heading {
+  margin-bottom: 30px;
+}
+
+.admin-eyebrow,
+.admin-page-eyebrow {
+  margin: 0 0 10px;
+
+  color: var(--admin-purple);
+
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1.2;
+
+  letter-spacing: 0.16em;
+
+  text-transform: uppercase;
+}
+
+.admin-page-header h1,
+.admin-page-heading h2 {
+  margin: 0;
+
+  color: var(--admin-text);
+
+  font-family:
+    "Manrope",
+    "Inter",
+    sans-serif;
+
+  font-size: clamp(42px, 4vw, 58px);
+  font-weight: 800;
+  line-height: 0.98;
+
+  letter-spacing: -0.06em;
+}
+
+.admin-page-description {
+  margin-top: 12px;
+
+  max-width: 720px;
+
+  color: #766f7e;
+
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.6;
+}
+
+
+/* =========================================================
+   15. SHARED PANELS
+========================================================= */
+
+.admin-panel,
+.admin-table-card {
+  background: var(--admin-surface);
+
+  border: 1px solid var(--admin-border);
+
+  border-radius: 17px;
+
+  box-shadow: var(--admin-shadow-sm);
+}
+
+.admin-panel-header,
+.admin-table-header {
+  min-height: 82px;
+
+  padding: 23px 26px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 20px;
+
+  border-bottom: 1px solid var(--admin-border);
+}
+
+.admin-panel-header h2,
+.admin-panel-header h3,
+.admin-table-header h2 {
+  color: #17131c;
+
+  font-size: 21px;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.admin-panel-header p {
+  margin-top: 5px;
+
+  color: #8a8290;
+
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.admin-panel-total {
+  flex-shrink: 0;
+
+  color: #766e7d;
+
+  font-size: 12px;
+  font-weight: 700;
+}
+
+
+/* =========================================================
+   16. SHARED BUTTONS
+========================================================= */
+
+.admin-primary-button,
+.admin-button.primary {
+  min-height: 43px;
+
+  padding: 0 17px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 0;
+  border-radius: 9px;
+
+  background: var(--admin-purple);
+
+  color: #ffffff;
+
+  font-size: 13px;
+  font-weight: 750;
+
+  text-decoration: none;
+
+  box-shadow:
+    0 8px 18px rgba(119, 65, 235, 0.18);
+
+  transition:
+    background 160ms ease,
+    transform 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.admin-primary-button:hover,
+.admin-button.primary:hover {
+  background: var(--admin-purple-dark);
+
+  transform: translateY(-1px);
+
+  box-shadow:
+    0 11px 24px rgba(119, 65, 235, 0.24);
+}
+
+.admin-primary-button:disabled {
+  opacity: 0.55;
+
+  transform: none;
+
+  box-shadow: none;
+}
+
+.admin-button.secondary {
+  min-height: 42px;
+
+  padding: 0 15px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid var(--admin-border-strong);
+  border-radius: 9px;
+
+  background: #ffffff;
+
+  color: #46404c;
+
+  font-size: 13px;
+  font-weight: 650;
+
+  text-decoration: none;
+
+  transition:
+    border-color 160ms ease,
+    background 160ms ease,
+    color 160ms ease;
+}
+
+.admin-button.secondary:hover {
+  border-color: var(--admin-purple-border);
+
+  background: var(--admin-purple-soft);
+
+  color: var(--admin-purple-dark);
+}
+
+
+/* =========================================================
+   17. SHARED ALERTS
+========================================================= */
+
+.admin-alert {
+  min-height: 52px;
+
+  margin-bottom: 20px;
+  padding: 13px 16px;
+
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  border: 1px solid;
+  border-radius: 11px;
+
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.admin-alert-error {
+  border-color: #f1cece;
+
+  background: var(--admin-red-soft);
+
+  color: #b52f2f;
+}
+
+.admin-alert-success {
+  border-color: #cbe9da;
+
+  background: var(--admin-green-soft);
+
+  color: #13774e;
+}
+
+.admin-alert span {
+  width: 24px;
+  height: 24px;
+
+  display: grid;
+  place-items: center;
+
+  flex-shrink: 0;
+
+  border-radius: 50%;
+
+  background: rgba(255, 255, 255, 0.65);
+
+  font-size: 12px;
+  font-weight: 800;
+}
+
+
+/* =========================================================
+   18. SHARED STATUS BADGES
+========================================================= */
+
+.admin-status-badge,
+.admin-payment-status {
+  min-height: 31px;
+
+  padding: 0 11px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+
+  border: 1px solid;
+
+  border-radius: 999px;
+
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1;
+
+  letter-spacing: 0.02em;
+
+  white-space: nowrap;
+}
+
+.admin-status-badge::before,
+.admin-payment-status::before {
+  content: "";
+
+  width: 6px;
+  height: 6px;
+
+  flex-shrink: 0;
+
+  border-radius: 50%;
+}
+
+
+/* ORDER STATUS */
+
+.status-pending,
+.payment-pending {
+  border-color: #f0ddb0;
+
+  background: var(--admin-yellow-soft);
+
+  color: #9a6907;
+}
+
+.status-pending::before,
+.payment-pending::before {
+  background: #d69213;
+}
+
+.status-confirmed {
+  border-color: #cfe2f8;
+
+  background: var(--admin-blue-soft);
+
+  color: #2866aa;
+}
+
+.status-confirmed::before {
+  background: #4187d7;
+}
+
+.status-shipped {
+  border-color: #d8cef7;
+
+  background: #f5f0ff;
+
+  color: #6840c5;
+}
+
+.status-shipped::before {
+  background: #8053df;
+}
+
+.status-delivered,
+.payment-success {
+  border-color: #ccebdd;
+
+  background: var(--admin-green-soft);
+
+  color: #13784e;
+}
+
+.status-delivered::before,
+.payment-success::before {
+  background: #15945f;
+}
+
+.status-cancelled,
+.payment-failed {
+  border-color: #f1d0d0;
+
+  background: var(--admin-red-soft);
+
+  color: #c43737;
+}
+
+.status-cancelled::before,
+.payment-failed::before {
+  background: #db4545;
+}
+
+.admin-status-large {
+  min-height: 38px;
+
+  padding: 0 15px;
+
+  font-size: 12px;
+}
+
+
+/* =========================================================
+   19. SHARED EMPTY STATE
+========================================================= */
+
+.admin-empty-state {
+  min-height: 260px;
+
+  padding: 45px 25px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  text-align: center;
+}
+
+.admin-empty-icon {
+  width: 50px;
+  height: 50px;
+
+  margin-bottom: 16px;
+
+  display: grid;
+  place-items: center;
+
+  border: 1px solid var(--admin-purple-border);
+  border-radius: 13px;
+
+  background: var(--admin-purple-soft);
+
+  color: var(--admin-purple);
+
+  font-family: "Manrope", sans-serif;
+  font-size: 17px;
+  font-weight: 800;
+}
+
+.admin-empty-state strong {
+  color: #211d26;
+
+  font-family: "Manrope", sans-serif;
+
+  font-size: 17px;
+  font-weight: 800;
+}
+
+.admin-empty-state p {
+  margin-top: 7px;
+
+  max-width: 400px;
+
+  color: #89818f;
+
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+
+/* =========================================================
+   20. SHARED LOADING STATE
+========================================================= */
+
+.admin-page-state,
+.admin-state {
+  min-height: 460px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  gap: 14px;
+
+  color: #756e7c;
+
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.admin-spinner {
+  width: 30px;
+  height: 30px;
+
+  border: 3px solid #e8e1f8;
+  border-top-color: var(--admin-purple);
+
+  border-radius: 50%;
+
+  animation: admin-spin 700ms linear infinite;
+}
+
+@keyframes admin-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+
+/* =========================================================
+   21. SHARED PAGINATION
+========================================================= */
+
+.admin-pagination {
+  margin-top: 20px;
+
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+
+  gap: 12px;
+}
+
+.admin-pagination button {
+  min-height: 40px;
+
+  padding: 0 15px;
+
+  border: 1px solid var(--admin-border);
+  border-radius: 9px;
+
+  background: #ffffff;
+
+  color: #4d4653;
+
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.admin-pagination button:hover:not(:disabled) {
+  border-color: var(--admin-purple-border);
+
+  background: var(--admin-purple-soft);
+
+  color: var(--admin-purple-dark);
+}
+
+.admin-pagination button:disabled {
+  opacity: 0.45;
+}
+
+.admin-pagination span {
+  color: #756e7c;
+
+  font-size: 12px;
+  font-weight: 600;
+}
+
+
+/* =========================================================
+   22. GLOBAL FORM ELEMENTS
+========================================================= */
+
+.admin-layout select,
+.admin-layout input,
+.admin-layout textarea {
+  color: #242027;
+
+  border-color: var(--admin-border);
+}
+
+.admin-layout select {
+  min-height: 43px;
+
+  padding: 0 13px;
+
+  border: 1px solid var(--admin-border);
+  border-radius: 9px;
+
+  background: #ffffff;
+
+  font-size: 13px;
+  font-weight: 600;
+
+  outline: none;
+
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.admin-layout select:focus,
+.admin-layout input:focus,
+.admin-layout textarea:focus {
+  border-color: rgba(119, 65, 235, 0.45);
+
+  outline: none;
+
+  box-shadow:
+    0 0 0 3px rgba(119, 65, 235, 0.08);
+}
+
+
+/* =========================================================
+   23. FOCUS ACCESSIBILITY
+========================================================= */
+
+.admin-layout
+  :where(
+    a,
+    button,
+    input,
+    select,
+    textarea
+  ):focus-visible {
+  outline: 2px solid #9a78ed;
+
+  outline-offset: 2px;
+}
+
+
+/* =========================================================
+   24. MOBILE SIDEBAR OVERLAY
+========================================================= */
+
+.admin-sidebar-overlay {
+  display: none;
+}
+
+
+/* =========================================================
+   25. RESPONSIVE — 1200px
+========================================================= */
+
+@media (max-width: 1200px) {
+
+  .admin-layout {
+    --admin-sidebar-width: 236px;
+  }
+
+  .admin-header {
+    padding-inline: 23px;
+  }
+
+  .admin-content {
+    padding-inline: 23px;
+  }
+
+  .admin-search {
+    width: 250px;
+  }
+
+  .admin-user-info,
+  .admin-user-chevron {
+    display: none;
+  }
+}
+
+
+/* =========================================================
+   26. RESPONSIVE — 900px
+========================================================= */
+
+@media (max-width: 900px) {
+
+  .admin-layout {
+    --admin-sidebar-width: 0px;
+  }
+
+  .admin-sidebar {
+    width: min(292px, 88vw);
+
+    transform: translateX(-100%);
+
+    box-shadow:
+      20px 0 50px rgba(0, 0, 0, 0.28);
+
+    transition:
+      transform 220ms ease;
+  }
+
+  .admin-sidebar.open {
+    transform: translateX(0);
+  }
+
+  .admin-sidebar-close {
+    display: flex;
+  }
+
+  .admin-sidebar-overlay {
+    position: fixed;
+    inset: 0;
+
+    z-index: 90;
+
+    display: block;
+
+    border: 0;
+
+    background: rgba(10, 14, 17, 0.46);
+
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+  }
+
+  .admin-main {
+    width: 100%;
+
+    margin-left: 0;
+  }
+
+  .admin-mobile-menu {
+    display: block;
+  }
+
+  .admin-header {
+    height: 70px;
+
+    padding-inline: 17px;
+  }
+
+  .admin-content {
+    padding: 28px 17px 50px;
+  }
+}
+
+
+/* =========================================================
+   27. RESPONSIVE — 640px
+========================================================= */
+
+@media (max-width: 640px) {
+
+  .admin-header {
+    padding-inline: 13px;
+
+    gap: 10px;
+  }
+
+  .admin-header-left {
+    gap: 9px;
+  }
+
+  .admin-header h1 {
+    font-size: 19px;
+  }
+
+  .admin-search {
+    display: none;
+  }
+
+  .admin-header-right {
+    gap: 6px;
+  }
+
+  .admin-header-divider {
+    display: none;
+  }
+
+  .admin-header-avatar {
+    width: 35px;
+    height: 35px;
+  }
+
+  .admin-logout-button {
+    width: 40px;
+    height: 38px;
+
+    padding: 0;
+
+    overflow: hidden;
+
+    font-size: 0;
+  }
+
+  .admin-logout-button::after {
+    content: "↗";
+
+    font-size: 15px;
+  }
+
+  .admin-content {
+    padding: 24px 13px 42px;
+  }
+
+  .admin-page-header,
+  .admin-page-heading {
+    margin-bottom: 24px;
+  }
+
+  .admin-page-header h1,
+  .admin-page-heading h2 {
+    font-size: 42px;
+  }
+
+  .admin-page-description {
+    font-size: 14px;
+  }
+
+  .admin-panel,
+  .admin-table-card {
+    border-radius: 14px;
+  }
+
+  .admin-panel-header,
+  .admin-table-header {
+    padding: 19px;
+  }
+}
+
+
+/* =========================================================
+   28. RESPONSIVE — 430px
+========================================================= */
+
+@media (max-width: 430px) {
+
+  .admin-header {
+    height: 64px;
+  }
+
+  .admin-breadcrumb {
+    font-size: 10px;
+  }
+
+  .admin-header h1 {
+    font-size: 18px;
+  }
+
+  .admin-content {
+    padding-inline: 11px;
+  }
+
+  .admin-page-header h1,
+  .admin-page-heading h2 {
+    font-size: 38px;
+  }
+
+  .admin-page-description {
+    font-size: 13px;
+  }
+
+  .admin-panel-header h2,
+  .admin-panel-header h3,
+  .admin-table-header h2 {
+    font-size: 18px;
+  }
+
+  .admin-panel-header,
+  .admin-table-header {
+    min-height: 70px;
+
+    padding: 17px;
+  }
+
+  .admin-pagination {
+    justify-content: center;
+  }
+}
+
+
+/* =========================================================
+   29. REDUCED MOTION
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+  .admin-layout *,
+  .admin-layout *::before,
+  .admin-layout *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
