@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import api from '../../../api/axios'
+import '../../../styles/admin/admin-paymentsDetails.css'
 
 function AdminPaymentDetailsPage() {
   const { id } = useParams()

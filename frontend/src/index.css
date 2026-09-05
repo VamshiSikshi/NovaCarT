@@ -1,4 +1,10 @@
-* {
+/* =========================================================
+   NOVACART — GLOBAL STYLES
+========================================================= */
+
+*,
+*::before,
+*::after {
   box-sizing: border-box;
 }
 
@@ -7,8 +13,11 @@ html {
 }
 
 :root {
+  /* ---------- Colors ---------- */
+
   --bg: #ffffff;
   --card: #ffffff;
+
   --text: #6b6375;
   --text-h: #08060d;
   --muted: #9993a1;
@@ -29,8 +38,20 @@ html {
   --success: #16834b;
   --warning: #c77b00;
 
+  /* ---------- Effects ---------- */
+
   --shadow:
     0 14px 35px rgba(20, 10, 40, 0.08);
+
+  --shadow-hover:
+    0 20px 45px rgba(20, 10, 40, 0.12);
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --radius-xl: 24px;
+
+  /* ---------- Typography ---------- */
 
   font-family:
     Inter,
@@ -46,8 +67,20 @@ html {
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
+
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* =========================================================
+   DOCUMENT
+========================================================= */
+
+html,
+body,
+#root {
+  width: 100%;
+  min-height: 100%;
 }
 
 body {
@@ -56,7 +89,41 @@ body {
   min-height: 100vh;
 
   background: var(--bg);
+  color: var(--text);
+
+  line-height: 1.5;
 }
+
+/* =========================================================
+   TYPOGRAPHY
+========================================================= */
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p {
+  margin-top: 0;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: var(--text-h);
+}
+
+p {
+  margin-bottom: 0;
+}
+
+/* =========================================================
+   ELEMENT NORMALIZATION
+========================================================= */
 
 button,
 input,
@@ -69,15 +136,54 @@ button {
   cursor: pointer;
 }
 
+button:disabled {
+  cursor: not-allowed;
+}
+
 img {
   max-width: 100%;
+  vertical-align: middle;
 }
 
 a {
   color: inherit;
 }
 
-#root {
-  width: 100%;
-  min-height: 100vh;
+input,
+select,
+textarea {
+  color: var(--text-h);
+}
+
+::selection {
+  background: var(--accent);
+  color: #ffffff;
+}
+
+/* =========================================================
+   ACCESSIBILITY
+========================================================= */
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
 }

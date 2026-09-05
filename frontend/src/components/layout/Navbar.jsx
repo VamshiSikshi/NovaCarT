@@ -1,48 +1,98 @@
-import { Link } from 'react-router-dom'
+import { Link, NavLink } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 
 function Navbar() {
   const { isAuthenticated, user, logout } = useAuth()
 
   return (
-    <nav>
-      <Link to="/">NovaCart</Link>
-
-      <Link to="/products">Products</Link>
-
-      {isAuthenticated && (
-        <>
-          <Link to="/cart">Cart</Link>
-          <Link to="/orders">Orders</Link>
-        </>
-      )}
-
-      {isAuthenticated && user?.role === 'ADMIN' && (
-        <Link to="/admin">
-          Admin Panel
+    <header className="site-header">
+      <nav className="site-navbar">
+        <Link to="/" className="site-brand">
+          Nova<span>Cart</span>
         </Link>
-      )}
 
-      {!isAuthenticated ? (
-        <>
-          <Link to="/login">Login</Link>
-          <Link to="/register">Register</Link>
-        </>
-      ) : (
-        <>
-          <span>
-            Hi, {user?.username}
-          </span>
-
-          <button
-            type="button"
-            onClick={logout}
+        <div className="site-nav-links">
+          <NavLink
+            to="/"
+            className={({ isActive }) =>
+              `site-nav-link ${isActive ? 'active' : ''}`
+            }
           >
-            Logout
-          </button>
-        </>
-      )}
-    </nav>
+            Home
+          </NavLink>
+
+          <NavLink
+            to="/products"
+            className={({ isActive }) =>
+              `site-nav-link ${isActive ? 'active' : ''}`
+            }
+          >
+            Products
+          </NavLink>
+
+          {isAuthenticated && (
+            <>
+              <NavLink
+                to="/cart"
+                className={({ isActive }) =>
+                  `site-nav-link ${isActive ? 'active' : ''}`
+                }
+              >
+                Cart
+              </NavLink>
+
+              <NavLink
+                to="/orders"
+                className={({ isActive }) =>
+                  `site-nav-link ${isActive ? 'active' : ''}`
+                }
+              >
+                Orders
+              </NavLink>
+            </>
+          )}
+
+          {isAuthenticated && user?.role === 'ADMIN' && (
+            <NavLink
+              to="/admin"
+              className={({ isActive }) =>
+                `site-nav-link admin-link ${isActive ? 'active' : ''}`
+              }
+            >
+              Admin
+            </NavLink>
+          )}
+        </div>
+
+        <div className="site-nav-actions">
+          {!isAuthenticated ? (
+            <>
+              <Link to="/login" className="nav-login">
+                Login
+              </Link>
+
+              <Link to="/register" className="nav-register">
+                Register
+              </Link>
+            </>
+          ) : (
+            <>
+              <span className="nav-user">
+                Hi, {user?.username}
+              </span>
+
+              <button
+                type="button"
+                className="nav-logout"
+                onClick={logout}
+              >
+                Logout
+              </button>
+            </>
+          )}
+        </div>
+      </nav>
+    </header>
   )
 }
 
