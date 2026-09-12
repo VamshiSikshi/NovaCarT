@@ -13,14 +13,17 @@ import java.util.List;
 public class OrderResponseDto {
 
     private Long id;
-
     private Long userId;
-
     private OrderStatus status;
-
     private BigDecimal totalAmount;
-
     private LocalDateTime createdAt;
-
     private List<OrderItemResponseDto> items;
+
+    private String shippingFullName;
+    private String shippingPhone;
+    private String shippingAddressLine;
+    private String shippingCity;
+    private String shippingState;
+    private String shippingPostalCode;
+    private String shippingCountry;
 }

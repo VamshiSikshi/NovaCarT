@@ -1,0 +1,638 @@
+/* =========================================================
+   ADMIN PAYMENT DETAILS
+   ========================================================= */
+
+.admin-payment-details-page {
+  width: 100%;
+  max-width: 1380px;
+  margin: 0 auto;
+  padding: 42px 44px 64px;
+  color: #17151d;
+}
+
+/* ---------------------------------------------------------
+   PAGE HEADER
+   --------------------------------------------------------- */
+
+.admin-payment-details-page .admin-page-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 32px;
+  margin-bottom: 34px;
+}
+
+.admin-payment-details-page .admin-page-header > div {
+  min-width: 0;
+}
+
+.admin-payment-details-page .admin-back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 22px;
+  color: #706a7c;
+  font-size: 14px;
+  font-weight: 650;
+  line-height: 1.4;
+  text-decoration: none;
+  transition:
+    color 180ms ease,
+    transform 180ms ease;
+}
+
+.admin-payment-details-page .admin-back-link:hover {
+  color: #7c3aed;
+  transform: translateX(-2px);
+}
+
+.admin-payment-details-page .admin-eyebrow {
+  margin: 0 0 9px;
+  color: #7c3aed;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+.admin-payment-details-title {
+  min-width: 0;
+}
+
+.admin-payment-details-title h1 {
+  margin: 0;
+  color: #111016;
+  font-size: clamp(32px, 3vw, 44px);
+  font-weight: 820;
+  letter-spacing: -0.045em;
+  line-height: 1.04;
+}
+
+.admin-payment-details-page .admin-page-description {
+  max-width: 620px;
+  margin: 12px 0 0;
+  color: #777181;
+  font-size: 15px;
+  font-weight: 480;
+  line-height: 1.65;
+}
+
+/* ---------------------------------------------------------
+   STATUS
+   --------------------------------------------------------- */
+
+.admin-payment-details-page .admin-payment-status,
+.admin-payment-details-page .admin-payment-status.payment-success,
+.admin-payment-details-page .admin-payment-status.payment-failed,
+.admin-payment-details-page .admin-payment-status.payment-pending {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 38px;
+  padding: 0 15px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.admin-payment-details-page .payment-success {
+  color: #087443;
+  background: #ecfdf4;
+  border-color: #b9ecd2;
+}
+
+.admin-payment-details-page .payment-failed {
+  color: #bd3030;
+  background: #fff1f1;
+  border-color: #f1c6c6;
+}
+
+.admin-payment-details-page .payment-pending {
+  color: #a45b00;
+  background: #fff8e9;
+  border-color: #f2d7a2;
+}
+
+/* ---------------------------------------------------------
+   SUMMARY CARDS
+   --------------------------------------------------------- */
+
+.admin-payment-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  margin-bottom: 22px;
+}
+
+.admin-payment-details-page .admin-stat-card {
+  min-width: 0;
+  padding: 25px 26px;
+  background: #ffffff;
+  border: 1px solid #e7e3eb;
+  border-radius: 18px;
+  box-shadow: 0 10px 30px rgba(30, 20, 50, 0.045);
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease,
+    border-color 180ms ease;
+}
+
+.admin-payment-details-page .admin-stat-card:hover {
+  transform: translateY(-2px);
+  border-color: #ddd4ee;
+  box-shadow: 0 16px 38px rgba(30, 20, 50, 0.075);
+}
+
+.admin-payment-details-page .admin-stat-label {
+  display: block;
+  margin-bottom: 13px;
+  color: #817b89;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.025em;
+  line-height: 1.4;
+}
+
+.admin-payment-details-page .admin-stat-card strong {
+  display: block;
+  overflow-wrap: anywhere;
+  color: #141219;
+  font-size: 27px;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  line-height: 1.15;
+}
+
+.admin-payment-details-page .admin-stat-card:first-child strong {
+  color: #7134df;
+  font-size: 30px;
+}
+
+.admin-payment-details-page .admin-stat-card p {
+  margin: 10px 0 0;
+  color: #928c99;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+/* ---------------------------------------------------------
+   PANELS
+   --------------------------------------------------------- */
+
+.admin-payment-details-page .admin-panel {
+  min-width: 0;
+  margin-bottom: 22px;
+  padding: 28px;
+  background: #ffffff;
+  border: 1px solid #e7e3eb;
+  border-radius: 18px;
+  box-shadow: 0 10px 30px rgba(30, 20, 50, 0.04);
+}
+
+.admin-payment-details-page .admin-panel-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 24px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #eeeaf1;
+}
+
+.admin-payment-details-page .admin-panel-header h2 {
+  margin: 0;
+  color: #17151d;
+  font-size: 20px;
+  font-weight: 780;
+  letter-spacing: -0.025em;
+  line-height: 1.25;
+}
+
+.admin-payment-details-page .admin-panel-header p {
+  margin: 7px 0 0;
+  color: #817b88;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.55;
+}
+
+/* ---------------------------------------------------------
+   INFORMATION GRID
+   --------------------------------------------------------- */
+
+.admin-payment-info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 56px;
+}
+
+.admin-payment-info-row {
+  display: grid;
+  grid-template-columns: minmax(110px, 145px) minmax(0, 1fr);
+  align-items: center;
+  gap: 20px;
+  min-width: 0;
+  min-height: 62px;
+  border-bottom: 1px solid #f0edf3;
+}
+
+.admin-payment-info-row:nth-last-child(-n + 2) {
+  border-bottom: 0;
+}
+
+.admin-payment-info-row > span:first-child {
+  color: #817b88;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.45;
+}
+
+.admin-payment-info-row > strong {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  color: #211e28;
+  font-size: 14px;
+  font-weight: 720;
+  line-height: 1.5;
+}
+
+.admin-payment-info-row .admin-payment-order {
+  min-width: 0;
+  color: #7134df;
+  font-size: 14px;
+  font-weight: 750;
+  text-decoration: none;
+}
+
+.admin-payment-info-row .admin-payment-order:hover {
+  text-decoration: underline;
+}
+
+/* ---------------------------------------------------------
+   PAYMENT METHOD
+   --------------------------------------------------------- */
+
+.admin-payment-details-page .admin-payment-method {
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  justify-content: center;
+  min-height: 32px;
+  padding: 0 11px;
+  border: 1px solid #e4dced;
+  border-radius: 8px;
+  background: #faf8ff;
+  color: #6940a8;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+/* ---------------------------------------------------------
+   TRANSACTION ID
+   --------------------------------------------------------- */
+
+.admin-payment-details-page .admin-payment-transaction {
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  color: #393440;
+  font-family:
+    "SFMono-Regular",
+    Consolas,
+    "Liberation Mono",
+    monospace;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.5;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ---------------------------------------------------------
+   ORDER REFERENCE
+   --------------------------------------------------------- */
+
+.admin-payment-order-panel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 28px;
+  min-width: 0;
+  padding: 22px;
+  border: 1px solid #eeeaf2;
+  border-radius: 14px;
+  background: #faf9fc;
+}
+
+.admin-payment-order-panel > div {
+  min-width: 0;
+}
+
+.admin-payment-order-panel strong {
+  display: block;
+  color: #1b1821;
+  font-size: 16px;
+  font-weight: 760;
+  line-height: 1.4;
+}
+
+.admin-payment-order-panel span {
+  display: block;
+  max-width: 650px;
+  margin-top: 6px;
+  color: #817b89;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.55;
+}
+
+.admin-payment-details-page .admin-button {
+  flex-shrink: 0;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 18px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 750;
+  line-height: 1;
+  text-decoration: none;
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease,
+    background 180ms ease;
+}
+
+.admin-payment-details-page .admin-button.primary {
+  color: #ffffff;
+  background: linear-gradient(
+    135deg,
+    #7c3aed,
+    #9333ea
+  );
+  box-shadow:
+    0 9px 22px rgba(124, 58, 237, 0.2);
+}
+
+.admin-payment-details-page .admin-button.primary:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    0 13px 28px rgba(124, 58, 237, 0.27);
+}
+
+.admin-payment-details-page .admin-button.secondary {
+  color: #332f39;
+  background: #ffffff;
+  border: 1px solid #ddd8e2;
+}
+
+.admin-payment-details-page .admin-button.secondary:hover {
+  border-color: #c9b9e6;
+  color: #7134df;
+  background: #faf8ff;
+}
+
+/* ---------------------------------------------------------
+   ALERTS
+   --------------------------------------------------------- */
+
+.admin-payment-details-page .admin-alert {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  min-height: 50px;
+  margin-bottom: 22px;
+  padding: 12px 16px;
+  border-radius: 11px;
+  font-size: 13px;
+  font-weight: 650;
+  line-height: 1.5;
+}
+
+.admin-payment-details-page .admin-alert-error {
+  color: #b42323;
+  background: #fff4f4;
+  border: 1px solid #f2caca;
+}
+
+.admin-payment-details-page .admin-alert-error > span {
+  display: inline-flex;
+  width: 24px;
+  height: 24px;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border-radius: 50%;
+  color: #ffffff;
+  background: #d14343;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+/* ---------------------------------------------------------
+   EMPTY / LOADING STATE
+   --------------------------------------------------------- */
+
+.admin-payment-details-page .admin-page-state {
+  min-height: 360px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  color: #777181;
+}
+
+.admin-payment-details-page .admin-page-state p {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.admin-payment-details-page .admin-empty-state {
+  padding: 70px 24px;
+  text-align: center;
+}
+
+.admin-payment-details-page .admin-empty-icon {
+  width: 54px;
+  height: 54px;
+  margin: 0 auto 17px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 14px;
+  color: #7134df;
+  background: #f1eaff;
+  font-size: 19px;
+  font-weight: 800;
+}
+
+.admin-payment-details-page .admin-empty-state strong {
+  display: block;
+  color: #1a1720;
+  font-size: 18px;
+  font-weight: 760;
+}
+
+.admin-payment-details-page .admin-empty-state p {
+  margin: 8px 0 20px;
+  color: #827c89;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+/* ---------------------------------------------------------
+   SPINNER
+   --------------------------------------------------------- */
+
+.admin-payment-details-page .admin-spinner {
+  width: 34px;
+  height: 34px;
+  border: 3px solid #ebe6f2;
+  border-top-color: #7c3aed;
+  border-radius: 50%;
+  animation: admin-payment-spin 0.75s linear infinite;
+}
+
+@keyframes admin-payment-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ---------------------------------------------------------
+   TABLET
+   --------------------------------------------------------- */
+
+@media (max-width: 1050px) {
+  .admin-payment-details-page {
+    padding: 34px 28px 52px;
+  }
+
+  .admin-payment-summary-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-payment-info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-payment-info-row:nth-last-child(-n + 2) {
+    border-bottom: 1px solid #f0edf3;
+  }
+
+  .admin-payment-info-row:last-child {
+    border-bottom: 0;
+  }
+
+  .admin-payment-order-panel {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+/* ---------------------------------------------------------
+   MOBILE
+   --------------------------------------------------------- */
+
+@media (max-width: 700px) {
+  .admin-payment-details-page {
+    padding: 28px 18px 44px;
+  }
+
+  .admin-payment-details-page .admin-page-header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .admin-payment-details-title h1 {
+    font-size: 32px;
+  }
+
+  .admin-payment-details-page .admin-page-description {
+    font-size: 14px;
+  }
+
+  .admin-payment-details-page .admin-panel {
+    padding: 21px 18px;
+    border-radius: 15px;
+  }
+
+  .admin-payment-details-page .admin-panel-header {
+    margin-bottom: 16px;
+    padding-bottom: 16px;
+  }
+
+  .admin-payment-details-page .admin-panel-header h2 {
+    font-size: 18px;
+  }
+
+  .admin-payment-info-row {
+    grid-template-columns: 1fr;
+    gap: 6px;
+    align-items: start;
+    min-height: auto;
+    padding: 15px 0;
+  }
+
+  .admin-payment-info-row > strong,
+  .admin-payment-info-row .admin-payment-order,
+  .admin-payment-info-row .admin-payment-transaction {
+    font-size: 14px;
+  }
+
+  .admin-payment-info-row .admin-payment-transaction {
+    max-width: 100%;
+  }
+
+  .admin-payment-order-panel {
+    padding: 18px;
+  }
+
+  .admin-payment-order-panel .admin-button {
+    width: 100%;
+  }
+}
+
+/* ---------------------------------------------------------
+   SMALL MOBILE
+   --------------------------------------------------------- */
+
+@media (max-width: 450px) {
+  .admin-payment-details-page {
+    padding: 24px 14px 38px;
+  }
+
+  .admin-payment-details-title h1 {
+    font-size: 28px;
+  }
+
+  .admin-payment-details-page .admin-stat-card {
+    padding: 21px;
+  }
+
+  .admin-payment-details-page .admin-stat-card strong {
+    font-size: 24px;
+  }
+
+  .admin-payment-details-page .admin-stat-card:first-child strong {
+    font-size: 27px;
+  }
+
+  .admin-payment-details-page .admin-status-large {
+    min-height: 34px;
+    padding: 0 12px;
+    font-size: 11px;
+  }
+}

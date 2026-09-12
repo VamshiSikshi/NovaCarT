@@ -2,27 +2,32 @@ package com.shivamsikarwar.novacart.exception;
 
 import com.shivamsikarwar.novacart.dto.ApiErrorResponse;
 import jakarta.servlet.http.HttpServletRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
     private static final Logger log =
             LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
+    // =========================
+    // VALIDATION
+    // =========================
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiErrorResponse> handleValidationException(
@@ -31,76 +36,73 @@ public class GlobalExceptionHandler {
 
         Map<String, String> errors = new HashMap<>();
 
-        ex.getBindingResult().getFieldErrors().forEach(error ->
-                errors.put(error.getField(), error.getDefaultMessage())
+        ex.getBindingResult()
+                .getFieldErrors()
+                .forEach(error ->
+                        errors.put(
+                                error.getField(),
+                                error.getDefaultMessage()
+                        )
+                );
+
+        ApiErrorResponse response = buildResponse(
+                HttpStatus.BAD_REQUEST,
+                "Validation failed",
+                request
         );
 
-        ApiErrorResponse response = new ApiErrorResponse();
-
-        response.setTimestamp(LocalDateTime.now());
-        response.setStatus(HttpStatus.BAD_REQUEST.value());
-        response.setError(HttpStatus.BAD_REQUEST.getReasonPhrase());
-        response.setMessage("Validation failed");
-        response.setPath(request.getRequestURI());
         response.setErrors(errors);
 
         return ResponseEntity
-                .badRequest()
+                .status(HttpStatus.BAD_REQUEST)
                 .body(response);
     }
+
+    // =========================
+    // NOT FOUND
+    // =========================
 
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ApiErrorResponse> handleResourceNotFound(
             ResourceNotFoundException ex,
             HttpServletRequest request) {
 
-        ApiErrorResponse response = new ApiErrorResponse();
+        return buildResponseEntity(
+                HttpStatus.NOT_FOUND,
+                ex.getMessage(),
+                request
+        );
+    }
 
-        response.setTimestamp(LocalDateTime.now());
-        response.setStatus(HttpStatus.NOT_FOUND.value());
-        response.setError(HttpStatus.NOT_FOUND.getReasonPhrase());
-        response.setMessage(ex.getMessage());
-        response.setPath(request.getRequestURI());
+    @ExceptionHandler(InvalidPasswordResetTokenException.class)
+    public ResponseEntity<Map<String, Object>> handleInvalidPasswordResetToken(
+            InvalidPasswordResetTokenException ex) {
+
+        Map<String, Object> body = new LinkedHashMap<>();
+
+        body.put("error", "Bad Request");
+        body.put("message", ex.getMessage());
+        body.put("status", HttpStatus.BAD_REQUEST.value());
 
         return ResponseEntity
-                .status(HttpStatus.NOT_FOUND)
-                .body(response);
+                .status(HttpStatus.BAD_REQUEST)
+                .body(body);
     }
+
+    // =========================
+    // CONFLICT
+    // =========================
 
     @ExceptionHandler(ResourceAlreadyExistsException.class)
     public ResponseEntity<ApiErrorResponse> handleResourceAlreadyExists(
             ResourceAlreadyExistsException ex,
             HttpServletRequest request) {
 
-        ApiErrorResponse response = new ApiErrorResponse();
-
-        response.setTimestamp(LocalDateTime.now());
-        response.setStatus(HttpStatus.CONFLICT.value());
-        response.setError(HttpStatus.CONFLICT.getReasonPhrase());
-        response.setMessage(ex.getMessage());
-        response.setPath(request.getRequestURI());
-
-        return ResponseEntity
-                .status(HttpStatus.CONFLICT)
-                .body(response);
-    }
-
-    @ExceptionHandler(AuthorizationDeniedException.class)
-    public ResponseEntity<ApiErrorResponse> handleAuthorizationDenied(
-            AuthorizationDeniedException ex,
-            HttpServletRequest request) {
-
-        ApiErrorResponse response = new ApiErrorResponse();
-
-        response.setTimestamp(LocalDateTime.now());
-        response.setStatus(HttpStatus.FORBIDDEN.value());
-        response.setError(HttpStatus.FORBIDDEN.getReasonPhrase());
-        response.setMessage("Access Denied");
-        response.setPath(request.getRequestURI());
-
-        return ResponseEntity
-                .status(HttpStatus.FORBIDDEN)
-                .body(response);
+        return buildResponseEntity(
+                HttpStatus.CONFLICT,
+                ex.getMessage(),
+                request
+        );
     }
 
     @ExceptionHandler(InvalidOrderStatusException.class)
@@ -108,18 +110,136 @@ public class GlobalExceptionHandler {
             InvalidOrderStatusException ex,
             HttpServletRequest request) {
 
-        ApiErrorResponse response = new ApiErrorResponse();
-
-        response.setTimestamp(LocalDateTime.now());
-        response.setStatus(HttpStatus.CONFLICT.value());
-        response.setError(HttpStatus.CONFLICT.getReasonPhrase());
-        response.setMessage(ex.getMessage());
-        response.setPath(request.getRequestURI());
-
-        return ResponseEntity
-                .status(HttpStatus.CONFLICT)
-                .body(response);
+        return buildResponseEntity(
+                HttpStatus.CONFLICT,
+                ex.getMessage(),
+                request
+        );
     }
+
+    @ExceptionHandler(InsufficientStockException.class)
+    public ResponseEntity<ApiErrorResponse> handleInsufficientStock(
+            InsufficientStockException ex,
+            HttpServletRequest request) {
+
+        return buildResponseEntity(
+                HttpStatus.CONFLICT,
+                ex.getMessage(),
+                request
+        );
+    }
+
+    @ExceptionHandler(InvalidPaymentException.class)
+    public ResponseEntity<ApiErrorResponse> handleInvalidPayment(
+            InvalidPaymentException ex,
+            HttpServletRequest request) {
+
+        return buildResponseEntity(
+                HttpStatus.CONFLICT,
+                ex.getMessage(),
+                request
+        );
+    }
+
+    // =========================
+    // UNAUTHORIZED
+    // =========================
+
+    @ExceptionHandler(AuthenticatedUserNotFoundException.class)
+    public ResponseEntity<ApiErrorResponse> handleAuthenticatedUserNotFound(
+            AuthenticatedUserNotFoundException ex,
+            HttpServletRequest request) {
+
+        return buildResponseEntity(
+                HttpStatus.UNAUTHORIZED,
+                ex.getMessage(),
+                request
+        );
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<ApiErrorResponse> handleBadCredentials(
+            BadCredentialsException ex,
+            HttpServletRequest request) {
+
+        return buildResponseEntity(
+                HttpStatus.UNAUTHORIZED,
+                "Invalid username or password",
+                request
+        );
+    }
+
+    // =========================
+    // FORBIDDEN
+    // =========================
+
+    @ExceptionHandler(AuthorizationDeniedException.class)
+    public ResponseEntity<ApiErrorResponse> handleAuthorizationDenied(
+            AuthorizationDeniedException ex,
+            HttpServletRequest request) {
+
+        return buildResponseEntity(
+                HttpStatus.FORBIDDEN,
+                "Access Denied",
+                request
+        );
+    }
+
+    // =========================
+    // BAD REQUEST
+    // =========================
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ApiErrorResponse> handleMessageNotReadable(
+            HttpMessageNotReadableException ex,
+            HttpServletRequest request) {
+
+        return buildResponseEntity(
+                HttpStatus.BAD_REQUEST,
+                "Invalid request body",
+                request
+        );
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ApiErrorResponse> handleIllegalArgumentException(
+            IllegalArgumentException ex,
+            HttpServletRequest request) {
+
+        return buildResponseEntity(
+                HttpStatus.BAD_REQUEST,
+                ex.getMessage(),
+                request
+        );
+    }
+
+    @ExceptionHandler(EmailNotFoundException.class)
+    public ResponseEntity<ApiErrorResponse> handleEmailNotFound(
+            EmailNotFoundException ex,
+            HttpServletRequest request) {
+
+        return buildResponseEntity(
+                HttpStatus.BAD_REQUEST,
+                ex.getMessage(),
+                request
+        );
+    }
+
+    @ExceptionHandler(InvalidPasswordException.class)
+    public ResponseEntity<ApiErrorResponse> handleInvalidPassword(
+            InvalidPasswordException ex,
+            HttpServletRequest request) {
+
+        return buildResponseEntity(
+                HttpStatus.BAD_REQUEST,
+                ex.getMessage(),
+                request
+        );
+    }
+
+    // =========================
+    // GENERIC ERROR
+    // =========================
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiErrorResponse> handleGenericException(
@@ -132,124 +252,62 @@ public class GlobalExceptionHandler {
                 ex
         );
 
-        ApiErrorResponse response = new ApiErrorResponse();
-
-        response.setTimestamp(LocalDateTime.now());
-        response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
-        response.setError(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
-        response.setMessage("An unexpected error occurred");
-        response.setPath(request.getRequestURI());
-
-        return ResponseEntity
-                .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(response);
+        return buildResponseEntity(
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                "An unexpected error occurred",
+                request
+        );
     }
 
-    @ExceptionHandler(InsufficientStockException.class)
-    public ResponseEntity<ApiErrorResponse> handleInsufficientStock(
-            InsufficientStockException ex,
+    // =========================
+    // RESPONSE BUILDER
+    // =========================
+
+    private ResponseEntity<ApiErrorResponse> buildResponseEntity(
+            HttpStatus status,
+            String message,
             HttpServletRequest request) {
 
-        ApiErrorResponse response = new ApiErrorResponse();
-
-        response.setTimestamp(LocalDateTime.now());
-        response.setStatus(HttpStatus.CONFLICT.value());
-        response.setError(HttpStatus.CONFLICT.getReasonPhrase());
-        response.setMessage(ex.getMessage());
-        response.setPath(request.getRequestURI());
+        ApiErrorResponse response =
+                buildResponse(
+                        status,
+                        message,
+                        request
+                );
 
         return ResponseEntity
-                .status(HttpStatus.CONFLICT)
+                .status(status)
                 .body(response);
     }
 
-    @ExceptionHandler(AuthenticatedUserNotFoundException.class)
-    public ResponseEntity<ApiErrorResponse> handleAuthenticatedUserNotFound(
-            AuthenticatedUserNotFoundException ex,
+    private ApiErrorResponse buildResponse(
+            HttpStatus status,
+            String message,
             HttpServletRequest request) {
 
-        ApiErrorResponse response = new ApiErrorResponse();
+        ApiErrorResponse response =
+                new ApiErrorResponse();
 
-        response.setTimestamp(LocalDateTime.now());
-        response.setStatus(HttpStatus.UNAUTHORIZED.value());
-        response.setError(HttpStatus.UNAUTHORIZED.getReasonPhrase());
-        response.setMessage(ex.getMessage());
-        response.setPath(request.getRequestURI());
+        response.setTimestamp(
+                LocalDateTime.now()
+        );
 
-        return ResponseEntity
-                .status(HttpStatus.UNAUTHORIZED)
-                .body(response);
+        response.setStatus(
+                status.value()
+        );
+
+        response.setError(
+                status.getReasonPhrase()
+        );
+
+        response.setMessage(message);
+
+        response.setPath(
+                request.getRequestURI()
+        );
+
+        return response;
     }
 
-    @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<ApiErrorResponse> handleMessageNotReadable(
-            HttpMessageNotReadableException ex,
-            HttpServletRequest request) {
 
-        ApiErrorResponse response = new ApiErrorResponse();
-
-        response.setTimestamp(LocalDateTime.now());
-        response.setStatus(HttpStatus.BAD_REQUEST.value());
-        response.setError(HttpStatus.BAD_REQUEST.getReasonPhrase());
-        response.setMessage("Invalid request body");
-        response.setPath(request.getRequestURI());
-
-        return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
-                .body(response);
-    }
-
-    @ExceptionHandler(InvalidPaymentException.class)
-    public ResponseEntity<ApiErrorResponse> handleInvalidPayment(
-            InvalidPaymentException ex,
-            HttpServletRequest request) {
-
-        ApiErrorResponse response = new ApiErrorResponse();
-
-        response.setTimestamp(LocalDateTime.now());
-        response.setStatus(HttpStatus.CONFLICT.value());
-        response.setError(HttpStatus.CONFLICT.getReasonPhrase());
-        response.setMessage(ex.getMessage());
-        response.setPath(request.getRequestURI());
-
-        return ResponseEntity
-                .status(HttpStatus.CONFLICT)
-                .body(response);
-    }
-
-    @ExceptionHandler(BadCredentialsException.class)
-    public ResponseEntity<ApiErrorResponse> handleBadCredentials(
-            BadCredentialsException ex,
-            HttpServletRequest request) {
-
-        ApiErrorResponse response = new ApiErrorResponse();
-
-        response.setTimestamp(LocalDateTime.now());
-        response.setStatus(HttpStatus.UNAUTHORIZED.value());
-        response.setError(HttpStatus.UNAUTHORIZED.getReasonPhrase());
-        response.setMessage("Invalid username or password");
-        response.setPath(request.getRequestURI());
-
-        return ResponseEntity
-                .status(HttpStatus.UNAUTHORIZED)
-                .body(response);
-    }
-
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<ApiErrorResponse> handleIllegalArgumentException(
-            IllegalArgumentException ex,
-            HttpServletRequest request) {
-
-        ApiErrorResponse response = new ApiErrorResponse();
-
-        response.setTimestamp(LocalDateTime.now());
-        response.setStatus(HttpStatus.BAD_REQUEST.value());
-        response.setError(HttpStatus.BAD_REQUEST.getReasonPhrase());
-        response.setMessage(ex.getMessage());
-        response.setPath(request.getRequestURI());
-
-        return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
-                .body(response);
-    }
 }

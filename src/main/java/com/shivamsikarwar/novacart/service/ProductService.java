@@ -10,7 +10,7 @@ import com.shivamsikarwar.novacart.exception.ResourceNotFoundException;
 import com.shivamsikarwar.novacart.repository.CategoryRepository;
 import com.shivamsikarwar.novacart.repository.ProductRepository;
 import com.shivamsikarwar.novacart.specification.ProductSpecification;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
@@ -41,6 +41,12 @@ public class ProductService {
     public ProductResponseDto createProduct(
             ProductRequestDto request) {
 
+        if (request.getPrice().compareTo(request.getOriginalPrice()) > 0) {
+            throw new IllegalArgumentException(
+                    "Selling price cannot be greater than original price"
+            );
+        }
+
         Category category =
                 findCategoryById(request.getCategoryId());
 
@@ -57,7 +63,8 @@ public class ProductService {
             Pageable pageable) {
 
         Page<Product> productPage =
-                productRepository.findAll(pageable);
+                productRepository.findAllWithCategory(pageable);
+
 
         return productPage.map(this::toResponseDto);
     }
@@ -82,6 +89,13 @@ public class ProductService {
             Long id,
             ProductRequestDto request) {
 
+        if (request.getPrice().compareTo(request.getOriginalPrice()) > 0) {
+            throw new IllegalArgumentException(
+                    "Selling price cannot be greater than original price"
+            );
+        }
+
+
         Product product =
                 findProductById(id);
 
@@ -90,6 +104,7 @@ public class ProductService {
 
         product.setName(request.getName());
         product.setDescription(request.getDescription());
+        product.setOriginalPrice(request.getOriginalPrice());
         product.setPrice(request.getPrice());
         product.setStock(request.getStock());
         product.setImageUrl(request.getImageUrl());
@@ -327,13 +342,50 @@ public class ProductService {
     public List<ProductResponseDto> getAllProductsWithEntityGraph() {
 
         return productRepository
-                .findAllBy()
+                .findAllWithCategory()
                 .stream()
                 .map(this::toResponseDto)
                 .toList();
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
+    @Transactional(readOnly = true)
+    public List<ProductResponseDto> getLowStockProducts(Integer threshold) {
 
+        if (threshold == null || threshold < 0) {
+            throw new IllegalArgumentException(
+                    "Stock threshold cannot be negative"
+            );
+        }
+
+        return productRepository
+                .findByStockLessThanEqualOrderByStockAsc(threshold)
+                .stream()
+                .map(this::toResponseDto)
+                .toList();
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @Transactional
+    public ProductResponseDto updateStock(
+            Long productId,
+            Integer stock) {
+
+        if (stock == null || stock < 0) {
+            throw new IllegalArgumentException(
+                    "Stock cannot be negative"
+            );
+        }
+
+        Product product = findProductById(productId);
+
+        product.setStock(stock);
+
+        Product updatedProduct =
+                productRepository.save(product);
+
+        return toResponseDto(updatedProduct);
+    }
 
     private ProductResponseDto toResponseDto(
             Product product) {
@@ -344,6 +396,7 @@ public class ProductService {
         response.setId(product.getId());
         response.setName(product.getName());
         response.setDescription(product.getDescription());
+        response.setOriginalPrice(product.getOriginalPrice());
         response.setPrice(product.getPrice());
         response.setStock(product.getStock());
         response.setImageUrl(product.getImageUrl());
@@ -367,6 +420,7 @@ public class ProductService {
 
         product.setName(request.getName());
         product.setDescription(request.getDescription());
+        product.setOriginalPrice(request.getOriginalPrice());
         product.setPrice(request.getPrice());
         product.setStock(request.getStock());
         product.setImageUrl(request.getImageUrl());

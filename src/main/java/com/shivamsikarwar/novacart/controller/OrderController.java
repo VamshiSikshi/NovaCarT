@@ -1,10 +1,8 @@
 package com.shivamsikarwar.novacart.controller;
 
-import com.shivamsikarwar.novacart.dto.OrderRequestDto;
-import com.shivamsikarwar.novacart.dto.OrderResponseDto;
-import com.shivamsikarwar.novacart.dto.OrderStatusResponseDto;
-import com.shivamsikarwar.novacart.dto.OrderStatusUpdateRequestDto;
+import com.shivamsikarwar.novacart.dto.*;
 import com.shivamsikarwar.novacart.service.OrderService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +25,7 @@ public class OrderController {
 
     @PostMapping
     public ResponseEntity<OrderResponseDto> createOrder(
-            @RequestBody OrderRequestDto request) {
+            @Valid @RequestBody OrderRequestDto request) {
 
         OrderResponseDto response =
                 orderService.createOrder(request);

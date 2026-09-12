@@ -1,0 +1,161 @@
+.settings-page {
+  min-height: calc(100vh - 72px);
+  padding: 48px 24px;
+  background: #f8f9fc;
+}
+
+.settings-container {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.settings-heading {
+  margin-bottom: 32px;
+}
+
+.settings-eyebrow {
+  margin: 0 0 8px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  color: #7c3aed;
+}
+
+.settings-heading h1 {
+  margin: 0;
+  font-size: 36px;
+  color: #111827;
+}
+
+.settings-heading p {
+  margin: 10px 0 0;
+  color: #6b7280;
+  font-size: 16px;
+}
+
+.settings-section {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  padding: 32px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+}
+
+.settings-section-header {
+  margin-bottom: 28px;
+}
+
+.settings-section-header h2 {
+  margin: 0;
+  font-size: 22px;
+  color: #111827;
+}
+
+.settings-section-header p {
+  margin: 8px 0 0;
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.settings-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 520px;
+}
+
+.settings-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.settings-field label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.settings-field input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 15px;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.settings-field input:focus {
+  border-color: #7c3aed;
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+}
+
+.settings-field input:disabled {
+  background: #f3f4f6;
+  cursor: not-allowed;
+}
+
+.settings-actions {
+  margin-top: 8px;
+}
+
+.settings-save-button {
+  border: none;
+  border-radius: 8px;
+  padding: 12px 20px;
+  background: #7c3aed;
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+}
+
+.settings-save-button:hover:not(:disabled) {
+  background: #6d28d9;
+}
+
+.settings-save-button:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.settings-save-button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.settings-error,
+.settings-success {
+  margin-bottom: 20px;
+  padding: 12px 14px;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.settings-error {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #b91c1c;
+}
+
+.settings-success {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  color: #15803d;
+}
+
+@media (max-width: 640px) {
+  .settings-page {
+    padding: 32px 16px;
+  }
+
+  .settings-heading h1 {
+    font-size: 30px;
+  }
+
+  .settings-section {
+    padding: 24px 20px;
+  }
+}
