@@ -13,8 +13,10 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 
+
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 @ControllerAdvice
@@ -70,6 +72,21 @@ public class GlobalExceptionHandler {
                 ex.getMessage(),
                 request
         );
+    }
+
+    @ExceptionHandler(InvalidPasswordResetTokenException.class)
+    public ResponseEntity<Map<String, Object>> handleInvalidPasswordResetToken(
+            InvalidPasswordResetTokenException ex) {
+
+        Map<String, Object> body = new LinkedHashMap<>();
+
+        body.put("error", "Bad Request");
+        body.put("message", ex.getMessage());
+        body.put("status", HttpStatus.BAD_REQUEST.value());
+
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(body);
     }
 
     // =========================
@@ -196,6 +213,30 @@ public class GlobalExceptionHandler {
         );
     }
 
+    @ExceptionHandler(EmailNotFoundException.class)
+    public ResponseEntity<ApiErrorResponse> handleEmailNotFound(
+            EmailNotFoundException ex,
+            HttpServletRequest request) {
+
+        return buildResponseEntity(
+                HttpStatus.BAD_REQUEST,
+                ex.getMessage(),
+                request
+        );
+    }
+
+    @ExceptionHandler(InvalidPasswordException.class)
+    public ResponseEntity<ApiErrorResponse> handleInvalidPassword(
+            InvalidPasswordException ex,
+            HttpServletRequest request) {
+
+        return buildResponseEntity(
+                HttpStatus.BAD_REQUEST,
+                ex.getMessage(),
+                request
+        );
+    }
+
     // =========================
     // GENERIC ERROR
     // =========================
@@ -267,4 +308,6 @@ public class GlobalExceptionHandler {
 
         return response;
     }
+
+
 }

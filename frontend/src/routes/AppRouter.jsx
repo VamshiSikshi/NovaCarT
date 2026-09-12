@@ -9,6 +9,9 @@ import AdminRoute from './AdminRoute'
 import HomePage from '../pages/HomePage'
 import LoginPage from '../pages/auth/LoginPage'
 import RegisterPage from '../pages/auth/RegisterPage'
+import ForgotPasswordPage from '../pages/auth/ForgotPasswordPage'
+import ResetPasswordPage from '../pages/auth/ResetPasswordPage'
+import ProfilePage from '../pages/profile/ProfilePage'
 
 import ProductsPage from '../pages/products/ProductsPage'
 import ProductDetailsPage from '../pages/products/ProductDetailsPage'
@@ -26,6 +29,8 @@ import AdminOrderDetailsPage from '../pages/admin/orders/AdminOrderDetailsPage'
 import AdminPaymentsPage from '../pages/admin/payments/AdminPaymentsPage'
 import AdminPaymentDetailsPage from '../pages/admin/payments/AdminPaymentDetailsPage'
 import AdminUsersPage from '../pages/admin/users/AdminUsersPage'
+
+import SettingsPage from '../pages/settings/SettingsPage'
 
 function AppRouter() {
   return (
@@ -53,6 +58,16 @@ function AppRouter() {
         />
 
         <Route
+          path="/forgot-password"
+          element={<ForgotPasswordPage />}
+        />
+
+        <Route
+          path="/reset-password"
+          element={<ResetPasswordPage />}
+        />
+
+        <Route
           path="/products"
           element={<ProductsPage />}
         />
@@ -63,6 +78,11 @@ function AppRouter() {
         />
 
         <Route element={<ProtectedRoute />}>
+
+          <Route
+            path="/profile"
+            element={<ProfilePage />}
+          />
 
           <Route
             path="/cart"
@@ -82,6 +102,11 @@ function AppRouter() {
           <Route
             path="/orders/:orderId"
             element={<OrderDetailsPage />}
+          />
+
+          <Route
+            path="/settings"
+            element={<SettingsPage />}
           />
 
         </Route>

@@ -22,9 +22,6 @@ public class JwtService {
 
         byte[] keyBytes = Decoders.BASE64.decode(secret);
 
-        System.out.println("JWT secret length = " + secret.length());
-        System.out.println("JWT decoded length = " + keyBytes.length);
-
         this.secretKey = Keys.hmacShaKeyFor(keyBytes);
         this.expiration = expiration;
     }
