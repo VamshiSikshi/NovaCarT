@@ -1,24 +1,46 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 
 function LoginPage() {
-  const [username, setUsername] = useState('')
+  const { login } = useAuth()
+  const navigate = useNavigate()
+  const location = useLocation()
+
+  const [identifier, setIdentifier] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
-  const { login } = useAuth()
-  const navigate = useNavigate()
+  const [success, setSuccess] = useState(
+    location.state?.registered
+      ? 'Account created successfully. Please sign in.'
+      : ''
+  )
 
   const handleSubmit = async (event) => {
     event.preventDefault()
 
     setError('')
+    setSuccess('')
+
+    const trimmedIdentifier = identifier.trim()
+
+    if (!trimmedIdentifier) {
+      setError('Username or email is required.')
+      return
+    }
+
+    if (!password) {
+      setError('Password is required.')
+      return
+    }
+
     setLoading(true)
 
     try {
-      await login(username, password)
+      await login(trimmedIdentifier, password)
+
       navigate('/products')
     } catch (error) {
       setError(
@@ -32,83 +54,166 @@ function LoginPage() {
 
   return (
     <main className="auth-page">
-      <section className="auth-shell">
-        <div className="auth-showcase">
-          <div className="auth-showcase-content">
-            <Link to="/" className="auth-brand">
-              Nova<span>Cart</span>
-            </Link>
+      <div className="auth-shell">
 
-            <div className="auth-showcase-copy">
-              <p className="auth-eyebrow">WELCOME TO NOVACART</p>
+        {/* LEFT BRAND PANEL */}
+        <section className="auth-brand-panel">
 
-              <h1>
-                Everything you need,
-                <span> in one place.</span>
-              </h1>
+          <div className="auth-brand-logo">
+            Nova<span>Cart</span>
+          </div>
 
-              <p>
-                Discover products you love, manage your orders,
-                and enjoy a simple shopping experience.
-              </p>
-            </div>
+          <div className="auth-brand-content">
 
-            <div className="auth-showcase-footer">
-              <span>Simple shopping.</span>
-              <span>Secure checkout.</span>
-              <span>Easy orders.</span>
+            <p className="auth-brand-eyebrow">
+              WELCOME TO NOVACART
+            </p>
+
+            <h1>
+              Everything you
+              <br />
+              need,
+              <span> in one place.</span>
+            </h1>
+
+            <p className="auth-brand-description">
+              Discover products you love, manage your orders,
+              and enjoy a simple shopping experience.
+            </p>
+
+            <div className="auth-benefits">
+
+              <div className="auth-benefit">
+                <div className="auth-benefit-icon">✓</div>
+
+                <div>
+                  <strong>Simple shopping</strong>
+                  <span>Find what you need quickly</span>
+                </div>
+              </div>
+
+              <div className="auth-benefit">
+                <div className="auth-benefit-icon">✓</div>
+
+                <div>
+                  <strong>Secure checkout</strong>
+                  <span>Your account stays protected</span>
+                </div>
+              </div>
+
+              <div className="auth-benefit">
+                <div className="auth-benefit-icon">✓</div>
+
+                <div>
+                  <strong>Easy orders</strong>
+                  <span>Track your purchases effortlessly</span>
+                </div>
+              </div>
+
             </div>
           </div>
-        </div>
 
-        <div className="auth-form-panel">
-          <div className="auth-form-wrapper">
-            <div className="auth-heading">
-              <p className="auth-form-eyebrow">ACCOUNT</p>
+          <div className="auth-brand-footer">
+            Shop smarter. Live better.
+          </div>
 
-              <h2>Welcome back</h2>
+        </section>
+
+        {/* LOGIN PANEL */}
+        <section className="auth-form-panel">
+
+          <div className="auth-form-content">
+
+            <div className="auth-form-heading">
+
+              <p className="auth-eyebrow">
+                ACCOUNT
+              </p>
+
+              <h2>
+                Welcome back
+              </h2>
 
               <p>
                 Sign in to continue to your NovaCart account.
               </p>
+
             </div>
 
-            <form className="auth-form" onSubmit={handleSubmit}>
+            {success && (
+              <div
+                className="auth-success"
+                role="status"
+              >
+                {success}
+              </div>
+            )}
+
+            {error && (
+              <div
+                className="auth-error"
+                role="alert"
+              >
+                {error}
+              </div>
+            )}
+
+            <form
+              className="auth-form"
+              onSubmit={handleSubmit}
+            >
+
               <div className="auth-field">
-                <label htmlFor="username">Username</label>
+
+                <label htmlFor="identifier">
+                  Username or Email
+                </label>
 
                 <input
-                  id="username"
                   type="text"
-                  value={username}
-                  onChange={(event) => setUsername(event.target.value)}
-                  placeholder="Enter your username"
+                  value={identifier}
+                  onChange={(event) => {
+                    setIdentifier(event.target.value)
+                    setError('')
+                  }}
+                  placeholder="Enter your username or email"
                   autoComplete="username"
-                  required
+                  disabled={loading}
                 />
+
               </div>
 
               <div className="auth-field">
+
                 <div className="auth-label-row">
-                  <label htmlFor="password">Password</label>
+
+                  <label htmlFor="login-password">
+                    Password
+                  </label>
+
+                  <Link
+                    to="/forgot-password"
+                    className="auth-forgot-link"
+                  >
+                    Forgot password?
+                  </Link>
+
                 </div>
 
                 <input
-                  id="password"
+                  id="login-password"
                   type="password"
                   value={password}
-                  onChange={(event) => setPassword(event.target.value)}
+                  onChange={(event) => {
+                    setPassword(event.target.value)
+                    setError('')
+                  }}
                   placeholder="Enter your password"
                   autoComplete="current-password"
-                  required
+                  disabled={loading}
                 />
-              </div>
 
-              {error && (
-                <div className="auth-error" role="alert">
-                  {error}
-                </div>
-              )}
+              </div>
 
               <button
                 type="submit"
@@ -117,15 +222,30 @@ function LoginPage() {
               >
                 {loading ? 'Signing in...' : 'Sign in'}
               </button>
+
             </form>
 
-            <p className="auth-switch">
-              Don't have an account?{' '}
-              <Link to="/register">Create an account</Link>
-            </p>
+            <div className="auth-divider">
+              <span>New to NovaCart?</span>
+            </div>
+
+            <div className="auth-create-account">
+
+              <span>
+                Don't have an account?
+              </span>
+
+              <Link to="/register">
+                Create an account
+              </Link>
+
+            </div>
+
           </div>
-        </div>
-      </section>
+
+        </section>
+
+      </div>
     </main>
   )
 }

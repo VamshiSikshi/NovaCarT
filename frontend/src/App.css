@@ -1,145 +1,4 @@
-/* =========================================================
-   NOVACART — APPLICATION UI
-   Customer-facing styles only.
-   Admin styles remain in: src/styles/admin.css
-========================================================= */
 
-/* =========================================================
-   SITE HEADER / NAVBAR
-========================================================= */
-
-.site-header {
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-  width: 100%;
-  background: rgba(255, 255, 255, 0.92);
-  border-bottom: 1px solid var(--border);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-}
-
-.site-navbar {
-  width: min(1180px, calc(100% - 40px));
-  min-height: 72px;
-  margin: 0 auto;
-  display: flex;
-  align-items: center;
-  gap: 28px;
-}
-
-.site-brand {
-  flex-shrink: 0;
-  color: var(--text-h);
-  font-size: 23px;
-  font-weight: 850;
-  letter-spacing: -1.2px;
-  text-decoration: none;
-}
-
-.site-brand span {
-  color: var(--accent);
-}
-
-.site-nav-links {
-  display: flex;
-  align-items: center;
-  gap: 3px;
-  flex: 1;
-}
-
-.site-nav-link {
-  position: relative;
-  padding: 9px 12px;
-  border-radius: 9px;
-  color: var(--text);
-  font-size: 13px;
-  font-weight: 650;
-  text-decoration: none;
-  transition:
-    color 0.2s ease,
-    background 0.2s ease;
-}
-
-.site-nav-link:hover,
-.site-nav-link.active {
-  color: var(--accent);
-  background: var(--accent-bg);
-}
-
-.admin-link {
-  margin-left: 4px;
-}
-
-.site-nav-actions {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-shrink: 0;
-}
-
-.nav-login,
-.nav-register,
-.nav-logout {
-  min-height: 38px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0 15px;
-  border-radius: 9px;
-  font-size: 12px;
-  font-weight: 750;
-  text-decoration: none;
-  transition:
-    transform 0.2s ease,
-    background 0.2s ease,
-    border-color 0.2s ease,
-    color 0.2s ease,
-    box-shadow 0.2s ease;
-}
-
-.nav-login {
-  color: var(--text-h);
-}
-
-.nav-login:hover {
-  color: var(--accent);
-}
-
-.nav-register {
-  border: 1px solid var(--accent);
-  background: var(--accent);
-  color: #fff;
-  box-shadow: 0 8px 20px var(--accent-shadow);
-}
-
-.nav-register:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 11px 25px var(--accent-shadow);
-}
-
-.nav-user {
-  max-width: 150px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  color: var(--text);
-  font-size: 12px;
-  font-weight: 650;
-}
-
-.nav-logout {
-  border: 1px solid var(--border);
-  background: var(--card);
-  color: var(--text-h);
-  cursor: pointer;
-}
-
-.nav-logout:hover {
-  border-color: var(--accent-border);
-  background: var(--accent-bg);
-  color: var(--accent);
-}
 
 /* =========================================================
    SHARED BUTTONS
@@ -1017,6 +876,17 @@ button:disabled,
   }
 }
 
+.navbar-settings-link {
+  text-decoration: none;
+  color: #6b7280;
+  font-weight: 600;
+  transition: color 0.2s;
+}
+
+.navbar-settings-link:hover,
+.navbar-settings-link.active {
+  color: #7c3aed;
+}
 
 /* =========================================================
    SHARED PAGE CONTAINER
@@ -1032,4 +902,53 @@ button:disabled,
   .page-container {
     width: min(100% - 32px, 1180px);
   }
+}
+
+
+.navbar-account {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.navbar-profile-link {
+  color: #6b6475;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.2s;
+}
+
+.navbar-profile-link:hover {
+  color: #7c3aed;
+}
+
+.navbar-profile-link.active {
+  color: #7c3aed;
+}
+
+.navbar-greeting {
+  color: #6b6475;
+  font-weight: 600;
+}
+
+.navbar-logout-button {
+  min-height: 42px;
+  padding: 0 18px;
+  border: 1px solid #ddd7e5;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #201c24;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    border-color 0.2s,
+    background 0.2s,
+    transform 0.15s;
+}
+
+.navbar-logout-button:hover {
+  border-color: #7c3aed;
+  background: #faf8ff;
+  transform: translateY(-1px);
 }

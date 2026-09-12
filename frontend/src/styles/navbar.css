@@ -1,0 +1,343 @@
+/* =========================================================
+   NAVBAR
+   ========================================================= */
+
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.92);
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+/* ---------------------------------------------------------
+   Navbar Container
+   --------------------------------------------------------- */
+
+.site-navbar {
+  width: min(1180px, calc(100% - 40px));
+  min-height: 72px;
+  margin: 0 auto;
+
+  display: flex;
+  align-items: center;
+  gap: 28px;
+}
+
+/* ---------------------------------------------------------
+   Brand
+   --------------------------------------------------------- */
+
+.site-brand {
+  flex-shrink: 0;
+
+  color: var(--text-h);
+  font-size: 23px;
+  font-weight: 850;
+  letter-spacing: -1.2px;
+  text-decoration: none;
+}
+
+.site-brand span {
+  color: var(--accent);
+}
+
+/* ---------------------------------------------------------
+   Navigation Links
+   --------------------------------------------------------- */
+
+.site-nav-links {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  flex: 1;
+}
+
+.site-nav-link {
+  position: relative;
+
+  padding: 9px 12px;
+  border-radius: 9px;
+
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 650;
+  text-decoration: none;
+
+  transition:
+    color 0.2s ease,
+    background 0.2s ease;
+}
+
+.site-nav-link:hover,
+.site-nav-link.active {
+  color: var(--accent);
+  background: var(--accent-bg);
+}
+
+.admin-link {
+  margin-left: 4px;
+}
+
+/* ---------------------------------------------------------
+   Right Side Actions
+   --------------------------------------------------------- */
+
+.site-nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+/* ---------------------------------------------------------
+   Login / Register
+   --------------------------------------------------------- */
+
+.nav-login,
+.nav-register,
+.nav-logout {
+  min-height: 38px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0 15px;
+  border-radius: 9px;
+
+  font-size: 12px;
+  font-weight: 750;
+  text-decoration: none;
+
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.nav-login {
+  color: var(--text-h);
+}
+
+.nav-login:hover {
+  color: var(--accent);
+}
+
+.nav-register {
+  border: 1px solid var(--accent);
+  background: var(--accent);
+  color: #fff;
+
+  box-shadow: 0 8px 20px var(--accent-shadow);
+}
+
+.nav-register:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 11px 25px var(--accent-shadow);
+}
+
+/* ---------------------------------------------------------
+   Logged-in Account Section
+   Profile + Greeting + Settings + Logout
+   --------------------------------------------------------- */
+
+.navbar-account {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+/* ---------------------------------------------------------
+   Profile Image
+   --------------------------------------------------------- */
+
+.navbar-profile-link {
+  width: 38px;
+  height: 38px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  border-radius: 50%;
+  text-decoration: none;
+  overflow: hidden;
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.navbar-profile-link:hover {
+  transform: translateY(-1px);
+}
+
+.navbar-profile-link.active {
+  box-shadow: 0 0 0 2px var(--accent);
+}
+
+.navbar-profile-image {
+  width: 38px;
+  height: 38px;
+
+  display: block;
+
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.navbar-profile-placeholder {
+  width: 38px;
+  height: 38px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: var(--accent);
+  color: #fff;
+
+  font-size: 15px;
+  font-weight: 750;
+}
+
+/* ---------------------------------------------------------
+   Greeting
+   --------------------------------------------------------- */
+
+.navbar-greeting {
+  max-width: 150px;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 650;
+}
+
+/* ---------------------------------------------------------
+   Settings
+   --------------------------------------------------------- */
+
+.navbar-settings-link {
+  width: 38px;
+  height: 38px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  border-radius: 50%;
+
+  color: var(--text);
+  text-decoration: none;
+
+  transition:
+    color 0.2s ease,
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.navbar-settings-link:hover {
+  background: var(--accent-bg);
+  color: var(--accent);
+  transform: translateY(-1px);
+}
+
+.navbar-settings-link.active {
+  background: var(--accent-bg);
+  color: var(--accent);
+}
+
+.navbar-settings-icon {
+  width: 21px;
+  height: 21px;
+
+  display: block;
+}
+
+/* ---------------------------------------------------------
+   Logout
+   --------------------------------------------------------- */
+
+.navbar-logout-button {
+  min-height: 38px;
+
+  padding: 0 15px;
+
+  border: 1px solid var(--border);
+  border-radius: 9px;
+
+  background: var(--card);
+  color: var(--text-h);
+
+  font: inherit;
+  font-size: 12px;
+  font-weight: 750;
+
+  cursor: pointer;
+
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.navbar-logout-button:hover {
+  border-color: var(--accent-border);
+  background: var(--accent-bg);
+  color: var(--accent);
+  transform: translateY(-1px);
+}
+
+/* =========================================================
+   RESPONSIVE NAVBAR
+   ========================================================= */
+
+@media (max-width: 700px) {
+  .site-navbar {
+    width: min(100% - 24px, 1180px);
+    gap: 16px;
+  }
+
+  .navbar-account {
+    gap: 10px;
+  }
+
+  .navbar-greeting {
+    max-width: 100px;
+  }
+
+  .navbar-profile-link,
+  .navbar-profile-image,
+  .navbar-profile-placeholder,
+  .navbar-settings-link {
+    width: 36px;
+    height: 36px;
+  }
+
+  .navbar-settings-icon {
+    width: 20px;
+    height: 20px;
+  }
+
+  .navbar-logout-button {
+    min-height: 36px;
+    padding: 0 12px;
+  }
+}

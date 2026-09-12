@@ -11,17 +11,25 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import com.shivamsikarwar.novacart.entity.UserProfile;
+import com.shivamsikarwar.novacart.repository.UserProfileRepository;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final UserProfileRepository userProfileRepository;
 
-    public UserService(PasswordEncoder passwordEncoder, UserRepository userRepository) {
+    public UserService(PasswordEncoder passwordEncoder,
+                       UserRepository userRepository,
+                       UserProfileRepository userProfileRepository) {
         this.passwordEncoder = passwordEncoder;
         this.userRepository = userRepository;
+        this.userProfileRepository=userProfileRepository;
     }
 
+    @Transactional
     public UserResponseDto createUser(UserRequestDto request) {
 
         if (userRepository.existsByUsername(request.getUsername())) {
@@ -44,6 +52,11 @@ public class UserService {
         user.setRole(Role.USER);
 
         User savedUser = userRepository.save(user);
+
+        UserProfile profile = new UserProfile();
+        profile.setUser(savedUser);
+
+        userProfileRepository.save(profile);
 
         return toResponseDto(savedUser);
     }
